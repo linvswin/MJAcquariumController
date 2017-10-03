@@ -1,0 +1,13 @@
+===================================
+Lo sketch usa 20256 byte (62%) dello spazio disponibile per i programmi. Il massimo è 32256 byte.
+Le variabili globali usano 919 byte (44%) di memoria dinamica, lasciando altri 1129 byte liberi per le variabili locali. Il massimo è 2048 byte.
+
+===================================
+
+I2C scanner. Scanning ...
+Found address: 32 (0x20)
+Found address: 33 (0x21)
+Found address: 87 (0x57)
+Found address: 104 (0x68)
+Done.
+Found 4 device(s).
