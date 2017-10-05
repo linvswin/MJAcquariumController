@@ -11,3 +11,14 @@ Found address: 87 (0x57)
 Found address: 104 (0x68)
 Done.
 Found 4 device(s).
+
+Program:   25096 bytes (76.6% Full)
+(.text + .data + .bootloader)
+
+Data:       1299 bytes (63.4% Full)
+(.data + .bss + .noinit)
+
+25138
+25070
+25092
+25036

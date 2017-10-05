@@ -1,28 +1,4 @@
 
-class Luci{
-  public:
-    byte OraOn;            //Pos 1
-    byte MinOn;           //Pos 2
-    byte OraOff;          //Pos 3
-    byte MinOff;          //Pos 4
-    byte OreFad;          //Pos 5
-    byte MinFad;          //Pos 6
-    byte OraFA;           //Pos 7
-    byte MinFA;           //Pos 8
-    byte OraIT;           //Pos 9
-    byte MinIT;           //Pos 10
-    byte Funzionamento;       //Pos 11 0 se la linea e Off in manuale, 1 se la linea ON in manuale, 2 se la linea è in AUT fuzionamento automatico
-    byte MaxFading;           //Pos 12 Contiene il valore di luminosità massima impostata
-    boolean Alba;             //stato alba
-    boolean Tramonto;         //stato tramonto
-    byte Fading;              //Valore di Fading
-    boolean StatoPower;       //Tiene lo stato dell'alimentazione della linea
-    unsigned long DeltaFading;    //Usato per lo storage del intervallo in millis per l'incremento/decremento del fading
-    unsigned long Tempoprec;      //Usato per lo storage di millis() durante l'esecuzione del fading
-    byte NrPin;                   //Contiene il numero di pin delle singole linee
-    byte Powerline;               //Contiene l'indirizzo del pin del pcf che comanda la scheda relé
-};
-
 void StampaValFading ()		//Nella funzione ImpostaFunzLinee() stampa i valori di fading in modo he siano sempre allineati nel modo giusto
 { 
   lcd.setCursor(16, 2);
@@ -80,23 +56,23 @@ void ImpostaFunzLinee() 	// Impostazione del modo di funzionamento e della lumin
 
   if (conferma == true)
   { 
-    if (tasto == ok)
+    if (tasto == tok)
     { 
       Parteimpostazione = 3;
       conferma = false;
-      tasto = 0;
+      tasto = tNull;
     }
 
-    if (tasto == dx)
+    if (tasto == tdx)
       SoglieCiclo(Parteimpostazione, 0, 2, 1);
 
-    if (tasto == sx)
+    if (tasto == tsx)
       SoglieCiclo(Parteimpostazione, 0, 2, 0);
   }
 
-  if (tasto == esc)
+  if (tasto == tesc)
   { 
-    Home = true;
+    menu=tHome;
     initfunc = true;
   }
 
@@ -106,10 +82,10 @@ void ImpostaFunzLinee() 	// Impostazione del modo di funzionamento e della lumin
   { 
     case 0:		// Scelta della linea da impostare
       lcd.print(F("^             "));
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(linea, 0, 2, 0);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(linea, 0, 2, 1);
 
       lcd.setCursor(6, 2);
@@ -120,20 +96,20 @@ void ImpostaFunzLinee() 	// Impostazione del modo di funzionamento e della lumin
 
     case 1:		// Scelta del modo di funzionamento della linea selezionata al case 0
       lcd.print(F("    ^^^      "));
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Appoggio[linea].Funzionamento, 0, 2, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Appoggio[linea].Funzionamento, 0, 2, 0);
       StampaFunzionamento();
       break;
 
     case 2:		// Impostazione della luminosità massima della linea impostata al case 0
       lcd.print(F("          ^^^"));
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Appoggio[linea].MaxFading, 0, 255, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Appoggio[linea].MaxFading, 0, 255, 0);
 
       StampaValFading();
@@ -144,7 +120,7 @@ void ImpostaFunzLinee() 	// Impostazione del modo di funzionamento e della lumin
       //lcd.print(F("    *CONFERMARE*    "));
       lcd.print(TXT_CONFERMARE);
       
-      if (tasto == ok)
+      if (tasto == tok)
       { 
         for (byte i = 0; i <= 2; i++)	//Salvataggio dei dati solo se cambiati e caricamento degli stessi nella struct principale
         { 
@@ -163,10 +139,10 @@ void ImpostaFunzLinee() 	// Impostazione del modo di funzionamento e della lumin
               Statoluci(i);
           }
         }
-        Home = true;
+        menu=tHome;
         initfunc = true;
       }
-      if (tasto == dx || tasto == sx || tasto == inc || tasto == dec)
+      if (tasto == tdx || tasto == tsx || tasto == tinc || tasto == tdec)
       { 
         linea = 0;
         conferma = true;
@@ -372,31 +348,28 @@ void GestioneLuci (byte linea)
 void InfoLuci()
 { 
   lcd.setCursor(0, 0);
-  lcd.print(F("     INFO LUCI      "));
+  lcd.print(TXT_INFOLUCI);
   for (byte linea = 0; linea <= 2; linea++)
   { 
     lcd.setCursor(0, linea + 1);
     lcd.print(F("L"));
     lcd.print(linea + 1);
-    lcd.print(F(": "));
-    if (Plafo[linea].StatoPower == false)
-      lcd.print(F("OFF"));
-    else
-      lcd.print(F("ON "));
+    lcd.print(TXT_DUEPUNTI);
+
+    lcd.print( ( Plafo[linea].StatoPower == false)? TXT_OFF : TXT_ON );
+
     lcd.print(F(" Fad:"));
     int perc = (Plafo[linea].Fading * 100) / Plafo[linea].MaxFading;
     lcd.print(perc);
-    lcd.print(F("%  "));
+    lcd.print(TXT_PERCENTUALE);
     lcd.setCursor(17, linea + 1);
-    if (Plafo[linea].Funzionamento == 2)
-      lcd.print(F("A"));
-    else
-      lcd.print(F("M"));
+
+    lcd.print( (Plafo[linea].Funzionamento == 2 ? F("A") : F("M")) );
   }
-  if (tasto == esc)
+  if (tasto == tesc)
   { 
     initfunc = true;
-    Home = true;
+    menu=tHome;
   }
 }
 
@@ -481,39 +454,39 @@ void ImpDatiFotoperiodo (byte linea)
 
   if (conferma == true)
   { 
-    if (tasto == ok)
+    if (tasto == tok)
     { 
       DatoFotoperiodo = Parteimpostazione;
       conferma = false;
-      tasto = 0;
+      tasto = tNull;
     }
 
-    if (tasto == dx)
+    if (tasto == tdx)
       SoglieCiclo(DatoFotoperiodo, LimitecaseInf, LimitecaseSup, 1);
 
-    if (tasto == sx)
+    if (tasto == tsx)
       SoglieCiclo(DatoFotoperiodo, LimitecaseInf, LimitecaseSup, 0);
   }
 
 
-  if (tasto == esc)
-    Home = true;
+  if (tasto == tesc)
+    menu=tHome;
 
   lcd.setCursor(0, 3);
 
   switch (DatoFotoperiodo)
   { 
     case 1:        // immissione dell'ora di accensione, coincide con Ora Inizio Alba OraIA
-      stampafrecce();
+      stampafrecce(0);
       lcd.print(F("                  "));
 
       OraOnPrec = Plafo[linea].OraOn;          // salvo OraOn iniziale
       OreTotPrec = OreTot;         // e ora totale fotoperiodo
 
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Plafo[linea].OraOn, 0, 23, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Plafo[linea].OraOn, 0, 23, 0);
 
       TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
@@ -528,17 +501,17 @@ void ImpDatiFotoperiodo (byte linea)
 
     case 2:	// immissione dei minuti dell'ora di accensione, coincide con Ora Inizio Alba OraIA
       lcd.print(F("   "));
-      stampafrecce();
+      stampafrecce(0);
       lcd.print(F("               "));
 
       MinOnPrec = Plafo[linea].MinOn;
       MinTotPrec = MinTot;
       OreTotPrec = OreTot;
 
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Plafo[linea].MinOn, 0, 59, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Plafo[linea].MinOn, 0, 59, 0);
 
       TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
@@ -554,16 +527,16 @@ void ImpDatiFotoperiodo (byte linea)
 
     case 3:
       lcd.print(F("              "));
-      stampafrecce();
+      stampafrecce(0);
       lcd.print(F("    "));
 
       OraOffPrec = Plafo[linea].OraOff;
       OreTotPrec = OreTot;
 
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Plafo[linea].OraOff, 0, 23, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Plafo[linea].OraOff, 0, 23, 0);
 
       TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
@@ -578,16 +551,16 @@ void ImpDatiFotoperiodo (byte linea)
 
     case 4:
       lcd.print(F("                 "));
-      stampafrecce();
+      stampafrecce(0);
 
       MinOffPrec = Plafo[linea].MinOff;
       MinTotPrec = MinTot;
       OreTotPrec = OreTot;
 
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Plafo[linea].MinOff, 0, 59, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Plafo[linea].MinOff, 0, 59, 0);
 
       TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
@@ -606,7 +579,7 @@ void ImpDatiFotoperiodo (byte linea)
       lcd.print(TXT_CONFERMARE);
       if (conferma == false)
       { 
-        if (tasto == ok)		// alla seconda pressione del tasto ok aggiorno le variabili in memoria, ma solo quelle affettivamente cambiate
+        if (tasto == tok)		// alla seconda pressione del tasto ok aggiorno le variabili in memoria, ma solo quelle affettivamente cambiate
         { // La variazione di questi valori comporta anche il ricalcolo a secondo dei casi delle variabili di inizio
           // alba e tramonto quindi anche queste vanno ricalcolate e memorizzate. vedi ultime due if
           if (Plafo[linea].OraOn != OraOnOld)
@@ -633,7 +606,7 @@ void ImpDatiFotoperiodo (byte linea)
         }
         else  // se non premo ok ma uno qualsiasi dei tasti torno alla modifica dei dati
         { 
-          if (tasto == dx || tasto == sx || tasto == inc || tasto == dec)
+          if (tasto == tdx || tasto == tsx || tasto == tinc || tasto == tdec)
           { 
             conferma = true;
             DatoFotoperiodo = LimitecaseInf;
@@ -643,15 +616,15 @@ void ImpDatiFotoperiodo (byte linea)
       break; // Chiude case 5 di DatoFotoperiodo per registrazione dati in memoria
 
     case 6:
-      stampafrecce();
+      stampafrecce(0);
       lcd.print(F("                  "));
 
       OreFadPrec = Plafo[linea].OreFad;
 
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Plafo[linea].OreFad, 0, 23, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Plafo[linea].OreFad, 0, 23, 0);
 
       Lucegiorno = LucePiena (OreTot, MinTot, Plafo[linea].OreFad, Plafo[linea].MinFad); // Calcolo l'intervallo di tempo di luce piena in minuti
@@ -668,15 +641,15 @@ void ImpDatiFotoperiodo (byte linea)
 
     case 7:
       lcd.print(F("   "));
-      stampafrecce();
+      stampafrecce(0);
       lcd.print(F("               "));
 
       MinFadPrec = Plafo[linea].MinFad;
 
-      if (tasto == inc)
+      if (tasto == tinc)
         SoglieCiclo(Plafo[linea].MinFad, 0, 59, 1);
 
-      if (tasto == dec)
+      if (tasto == tdec)
         SoglieCiclo(Plafo[linea].MinFad, 0, 59, 0);
 
       Lucegiorno = LucePiena (OreTot, MinTot, Plafo[linea].OreFad, Plafo[linea].MinFad); // Calcolo l'intervallo di tempo di luce piena in minuti
@@ -696,7 +669,7 @@ void ImpDatiFotoperiodo (byte linea)
       lcd.print(TXT_CONFERMARE);
       if (conferma == false)
       { 
-        if (tasto == ok)
+        if (tasto == tok)
         {
           if (Plafo[linea].OreFad != OreFadOld)
             EEPROM.write((IndBase + 5), Plafo[linea].OreFad);
@@ -733,11 +706,11 @@ void ImpDatiFotoperiodo (byte linea)
 
           Statoluci(linea);
           conferma = true;
-          Home = true;
+          menu=tHome;
           initfunc = true;
         }
       }else{ 
-        if (tasto == dx || tasto == sx || tasto == inc || tasto == dec)
+        if (tasto == tdx || tasto == tsx || tasto == tinc || tasto == tdec)
         { 
           conferma = true;
           DatoFotoperiodo = LimitecaseInf;

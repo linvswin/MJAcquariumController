@@ -1,14 +1,16 @@
 
+/**
+ * Impostazione della temperatura dell'acqua, e sua memorizzazione in memoria,
+ * potendo memorizzare in memoria solo byte (interi da 0 a 255) ho stabilitto 40° come valore massimo
+ * e incrementi di immissione di 0,5° in modo che quando
+ * scrivo in memoria divido il valore acquisito per l'incremento in modo da ottenere l'intero da memorizzare,
+ * quando invece leggo il valore, lo rimoltiplico per l'incremento per ottenere nuovamente il valore impostato
+ * esempio imposto il valore a 27,5° in memoria scrivo 55 ossia 27,5/0,5
+ * leggo il valore in memoria: 55, lo moltiplico per 0,5 ed ottengo 27,5 ossia il valore impostato
+ * se decidessimo per un incremento di 0,25 sarebbe la stessa cosa, ma mi è sembrato eccessivo.
+*/
 void Impostatempacqua()
-{ // Impostazione della temperatura dell'acqua, e sua memorizzazione in memoria,
-  // potendo memorizzare in memoria solo byte (interi da 0 a 255) ho stabilitto 40° come valore massimo
-  // e incrementi di immissione di 0,5° in modo che quando
-  // scrivo in memoria divido il valore acquisito per l'incremento in modo da ottenere l'intero da memorizzare,
-  // quando invece leggo il valore, lo rimoltiplico per l'incremento per ottenere nuovamente il valore impostato
-  // esempio imposto il valore a 27,5° in memoria scrivo 55 ossia 27,5/0,5
-  // leggo il valore in memoria: 55, lo moltiplico per 0,5 ed ottengo 27,5 ossia il valore impostato
-  // se decidessimo per un incremento di 0,25 sarebbe la stessa cosa, ma mi è sembrato eccessivo.
-
+{
   if (initfunc == true) // Leggo in memoria il valore impostato e predispongo la schermata del display
   { 
     Tempacquaset = (EEPROM.read(Tempind)) * 0.5;
@@ -31,9 +33,9 @@ void Impostatempacqua()
   lcd.print(Tempacquaset);
   lcd.write(0b011011111);
 
-  if (tasto == esc)
+  if (tasto == tesc)
   { 
-    Home = true;
+    menu=tHome;
     initfunc = true;
     conferma = false;
   }
@@ -41,11 +43,11 @@ void Impostatempacqua()
   if (!conferma)
   {
     lcd.setCursor(6, 3);
-    stampafrecce();
+    stampafrecce(0);
     lcd.print(F(" "));
-    stampafrecce();
+    stampafrecce(0);
 
-    if (tasto == inc)
+    if (tasto == tinc)
     { 
       if (Tempacquaset < 40.0)
         Tempacquaset = Tempacquaset + 0.5;
@@ -53,7 +55,7 @@ void Impostatempacqua()
         beep = 3;
     }
 
-    if (tasto == dec)
+    if (tasto == tdec)
     { 
       if (Tempacquaset > 0)
         Tempacquaset = Tempacquaset - 0.5;
@@ -61,28 +63,28 @@ void Impostatempacqua()
         beep = 3;
     }
 
-    if (tasto == ok) {
+    if (tasto == tok) {
       conferma = true; // disattivo questa if in modo che Il tasto OK funzioni solo con la if di conferma definitiva
       lcd.setCursor(0, 3);
       //lcd.print(F("    *CONFERMARE*    "));
       lcd.print(TXT_CONFERMARE);
-      tasto = 0;
+      tasto = tNull;
     }
   } else {
-    if (tasto == ok)
+    if (tasto == tok)
     { 
       if (Tempvecchia != Tempacquaset)
       { Tempacquaint = (Tempacquaset / 0.5);
         EEPROM.write(Tempind, Tempacquaint);
       }
       Tempmod = true;
-      Home = true;
+      menu=tHome;
       initfunc = true;
       conferma = false;
-      tasto = 0;
+      tasto = tNull;
     }
 
-    if ((tasto == dx) || (tasto == sx) || (tasto == inc) || (tasto == dec))
+    if ((tasto == tdx) || (tasto == tsx) || (tasto == tinc) || (tasto == tdec))
     { 
       lcd.setCursor(0, 3);
       lcd.print(F("                    "));
@@ -120,7 +122,7 @@ void MantenimentoTempAcqua ()
   if ((tmed < Tempacqua - temprange) || (tmed > Tempacqua + temprange))
   { 
     statoalrm = 1;
-    if (tasto == esc)
+    if (tasto == tesc)
       alrmsonoro = false;
 
     if (millis() - tmplampprec > 1000)
@@ -128,7 +130,7 @@ void MantenimentoTempAcqua ()
       tmplampprec = millis();
       statoalrm = 1 - statoalrm;
     }
-    if (Home == true)
+    if (menu==tHome)
     { 
       if (statoalrm == 1)
       { 
@@ -143,7 +145,7 @@ void MantenimentoTempAcqua ()
     if (alrmsonoro == true)
       beep = 1;
   } else { 
-    if (Home == true)
+    if (menu==tHome)
     { 
       lcd.print(tmed);
       lcd.write(0b011011111);
