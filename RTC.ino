@@ -44,8 +44,8 @@ uint8_t giornimese[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }; // 
 
 void ImpostaData()   // Funzione per impostazione data
 {
-	uint8_t giornoimp, meseimp, oraimp, minutiimp, secondiimp, datotempo;
-	int annoimp;
+	//uint8_t giornoimp, meseimp, oraimp, minutiimp, secondiimp, datotempo;
+	//int annoimp;
 
 	if (initfunc == true)//If di inizializzazazione della procedura, viene eseguita na sola volta
 	{
@@ -94,57 +94,36 @@ void ImpostaData()   // Funzione per impostazione data
 	switch (datotempo) {
 	case 1: // Imposto giorno ////////////////////////////////////////////////////////////////////////////////////
 		stampafrecce(0);
-		//lcd.print(F("                  "));
-		//lcd.print(F("                    "));
-
 		if (tasto == tinc) SoglieCiclo(giornoimp, 1, giornimese[mjAcquariumController.now.Month() - 1], 1);
 		if (tasto == tdec) SoglieCiclo(giornoimp, 1, giornimese[mjAcquariumController.now.Month() - 1], 0);
 		break; // chiude case 1 di datotempo per impostazione data
-
 	case 2: // Imposto mese ////////////////////////////////////////////////////////////////////////////////////////
-		//lcd.print(F("   "));
 		stampafrecce(3);
-		//lcd.print(F("               "));
-
 		if (tasto == tinc) SoglieCiclo(meseimp, 1, 12, 1);
 		if (tasto == tdec) SoglieCiclo(meseimp, 1, 12, 0);
 		break;  // Chiude case 2 di dato tempo per impostazione mese
-
 	case 3: // Imposto anno ////////////////////////////////////////////////////////////////////////////////////
-		//lcd.print(F("      "));
 		stampafrecce(8);
-
-		//lcd.print(F("          "));
 		if (tasto == tinc) annoimp++;
 		if (tasto == tdec) annoimp--;
 		break;  // Chiude case 3 di datotempo per imposstazione anno
-
 	case 4: // Imposto ora ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//lcd.print(F("            "));
 		stampafrecce(12);
-		//lcd.print(F("     "));
-
 		if (tasto == tinc) SoglieCiclo(oraimp, 0, 23, 1);
 		if (tasto == tdec) SoglieCiclo(oraimp, 0, 23, 0);
 		break;	// Chiude case 4 di datotempo per imposstazione ora
-
 	case 5: // Imposto minuti ///////////////////////////////////////////////////////////////////////////////////////
-		//lcd.print(F("               "));
 		stampafrecce(15);
-
 		if (tasto == tinc) SoglieCiclo(minutiimp, 0, 59, 1);
 		if (tasto == tdec) SoglieCiclo(minutiimp, 0, 59, 0);
 		break;  // Chiude case 5 di datotempo per impostazione minuti
-
 	case 6:
 		if (conferma == false) {
-			//lcd.print(F("          "));
 			lcd.setCursor(4, 3);
 			lcd.print(TXT_CONFERMARE);
 
 			if (tasto == tok) {
 				//mjAcquariumController.RTC.SetDateTime(compiled);
-
 				Wire.beginTransmission(0x68);//il primo byte stabilisce il registro iniziale da scivere
 				Wire.write((byte) 0x00);
 				Wire.write(decToBcd(mjAcquariumController.now.Second()));

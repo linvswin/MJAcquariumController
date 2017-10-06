@@ -26,7 +26,7 @@
 //#define TXT_BARRA               F("/")
 //#define TXT_DUEPUNTI            F(":")
 
-const char* TXT_DUEPUNTI=":";
+const char * TXT_DUEPUNTI=":";
 const char * TXT_BARRA="/";
 const char * TXT_SPAZIO=" ";
 
@@ -47,7 +47,8 @@ const char * TXT_SPAZIO=" ";
 //int anno;
 //byte datotempo;
 
-//int annoimp,
+uint8_t giornoimp, meseimp, oraimp, minutiimp, secondiimp, datotempo;
+int annoimp;
 int annoold;
 //boolean Home;
 
@@ -227,23 +228,14 @@ Keypad_I2C keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS,
 #define D6_pin  2
 #define D7_pin  3
 
-LiquidCrystal_I2C lcd(I2C_ADDR_LCD, En_pin, Rw_pin, Rs_pin, D4_pin, D5_pin,
-		D6_pin, D7_pin, BACKLIGHT_PIN, NEGATIVE);
+LiquidCrystal_I2C lcd(I2C_ADDR_LCD, En_pin, Rw_pin, Rs_pin, D4_pin, D5_pin,	D6_pin, D7_pin, BACKLIGHT_PIN, NEGATIVE);
 //LiquidCrystal_I2C lcd(I2C_ADDR_LCD, 20, 4); // Imposto l'indirizzo del display a 0x38 e dichiaro 20 colonne e 4 righe
 
 /**
  * vettore che contiene i dati per creare una freccia rivolta verso l'alto per evidenziare i dati
  * da impostare nei vari menu
  */
-byte frecciaalto[8] = {
-B00100,
-B01110,
-B11111,
-B00000,
-B00000,
-B00000,
-B00000,
-B00000 };
+byte frecciaalto[8] = {B00100,B01110,B11111,B00000,B00000,B00000,B00000,B00000 };
 
 void keypadEvent(KeypadEvent eKey) {
 	//Serial.println(eKey);
