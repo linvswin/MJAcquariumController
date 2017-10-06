@@ -15,20 +15,29 @@
 #define Reset_AVR() wdt_enable(WDTO_30MS); while(1) {}
 
 #define TXT_CONFERMARE          F("*CONFERMARE*")
-#define TXT_IMP_TEMP_ACQUA      F("  IMP. TEMP. ACQUA  ")
+#define TXT_IMP_TEMP_ACQUA      F("IMP. TEMP. ACQUA")
 #define TXT_TEMP                F("Temp.:")
 #define TXT_APP_NAME            F(" Aquarium Controller")
 #define TXT_UNABLE_FIND_DEVICE  F("Unable to find address for Device ")
 #define TXT_OFF                 F("Off")
 #define TXT_ON                  F("On ")
 #define TXT_AUTOMATICO          F("Aut")
-#define TXT_SPAZIO              F(" ")
-#define TXT_BARRA               F("/")
-#define TXT_DUEPUNTI            F(":")
+//#define TXT_SPAZIO              F(" ")
+//#define TXT_BARRA               F("/")
+//#define TXT_DUEPUNTI            F(":")
+
+const char* TXT_DUEPUNTI=":";
+const char * TXT_BARRA="/";
+const char * TXT_SPAZIO=" ";
+
 #define TXT_PERCENTUALE         F("%")
 #define TXT_INFOLUCI			F("     INFO LUCI      ")
 #define TXT_IMPDATAORA			F("Imp Data/Ora")
-
+#define TXT_IMPFOTOPERIODO		F("IMP.FOTOPERIODO L")
+#define TXT_ACCLUNGSPG			F("Acc.   Lung.  Spg.  ")
+#define TXT_IMPDURFADINGL		F("Imp. Dur. Fading L")
+#define TXT_DURFADLUCEMAX		F("Dur.Fad.    Luce Max")
+#define TXT_IMPFUNZLUMMAX		F("IMP. FUNZ. E LUM.MAX")
 //#include "MJAcquariumController.h"
 
 //////////////////////////////////////////////////////////
@@ -52,8 +61,8 @@ int annoold;
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress Termometro1, Termometro2;
-float t1, t2, tmed;
-float Tempacqua, Tempacquaset, Tempvecchia;
+float t1, t2, tmed,
+	 Tempacqua, Tempacquaset, Tempvecchia;
 byte Tempacquaint, Tempacquadec;
 byte Tempind = 37;
 boolean Tempmod;
@@ -78,31 +87,31 @@ byte Linea3 = 2;
 
 struct DatiLuci	//I valori di Pos, vengono usati per determinare l'indirizzo di memoria in cui vengono registrati gli orari
 {
-	byte OraOn;						//Pos 1
-	byte MinOn;						//Pos 2
-	byte OraOff;					//Pos 3
-	byte MinOff;					//Pos 4
-	byte OreFad;					//Pos 5
-	byte MinFad;					//Pos 6
-	byte OraFA;						//Pos 7
-	byte MinFA;						//Pos 8
-	byte OraIT;						//Pos 9
-	byte MinIT;						//Pos 10
-	byte Funzionamento;	//Pos 11 0 se la linea e Off in manuale, 1 se la linea ON in manuale, 2 se la linea è in AUT fuzionamento automatico
-	byte MaxFading;	//Pos 12 Contiene il valore di luminosità massima impostata
-	boolean Alba;	    				//stato alba
-	boolean Tramonto;	  			//stato tramonto
-	byte Fading;				    	//Valore di Fading
+	byte OraOn;					//Pos 1
+	byte MinOn;					//Pos 2
+	byte OraOff;				//Pos 3
+	byte MinOff;				//Pos 4
+	byte OreFad;				//Pos 5
+	byte MinFad;				//Pos 6
+	byte OraFA;					//Pos 7
+	byte MinFA;					//Pos 8
+	byte OraIT;					//Pos 9
+	byte MinIT;					//Pos 10
+	byte Funzionamento;			//Pos 11 0 se la linea e Off in manuale, 1 se la linea ON in manuale, 2 se la linea è in AUT fuzionamento automatico
+	byte MaxFading;				//Pos 12 Contiene il valore di luminosità massima impostata
+	boolean Alba;	    		//stato alba
+	boolean Tramonto;	  		//stato tramonto
+	byte Fading;				//Valore di Fading
 	boolean StatoPower;			//Tiene lo stato dell'alimentazione della linea
-	unsigned long DeltaFading;//Usato per lo storage del intervallo in millis per l'incremento/decremento del fading
-	unsigned long Tempoprec;//Usato per lo storage di millis() durante l'esecuzione del fading
+	unsigned long DeltaFading;	//Usato per lo storage del intervallo in millis per l'incremento/decremento del fading
+	unsigned long Tempoprec;	//Usato per lo storage di millis() durante l'esecuzione del fading
 	byte NrPin;					//Contiene il numero di pin delle singole linee
-	byte Powerline;	//Contiene l'indirizzo del pin del pcf che comanda la scheda relé
+	byte Powerline;				//Contiene l'indirizzo del pin del pcf che comanda la scheda relé
 };
 
 struct DatiLuci Plafo[3];
 
-byte OraOnOld, MinOnOld, OraOffOld, MinOffOld, OreFadOld, MinFadOld;
+//byte OraOnOld, MinOnOld, OraOffOld, MinOffOld, OreFadOld, MinFadOld;
 byte OraOnPrec, OreTotPrec, MinOnPrec, MinTotPrec, OraOffPrec, MinOffPrec,
 		OreFadPrec, MinFadPrec, OreLuceMax, MinLuceMax; // Variabili per controlli variazione
 byte OreTot, MinTot, nrlinea;
@@ -132,6 +141,11 @@ byte riscaldatore;
 const int schrele = 0x3A;  //PCF8574AP A0 GND, A1 VCC, A2 GND
 
 // Indirizzi dei pin del PCF dedicato alla scheda relé
+//#define rele1		0x1		//Termostato
+//#define rele2		0x2		//Alimentazione linea 1 Luci
+//#define rele3		0x4		//Alimentazione linea 2 Luci
+//#define rele4		0x8		//Alimentazione linea 3 Luci
+
 const byte rele1 = 0x1;  //Termostato
 const byte rele2 = 0x2;  //Alimentazione linea 1 Luci
 const byte rele3 = 0x4;  //Alimentazione linea 2 Luci
@@ -145,9 +159,7 @@ byte appoggio; //, tasto;
 volatile boolean counter = false;
 boolean rstpcf;
 
-enum Tasti {
-	tNull, tsx, tdx, tinc, tdec, tok, tesc
-};
+enum Tasti { tNull, tsx, tdx, tinc, tdec, tok, tesc };
 Tasti tasto;
 
 /*const byte sx = 193;
@@ -174,13 +186,10 @@ enum tMenu {
 	tHome, tImp, tLuci
 };
 tMenu menu;
-char* VociMenuPrincipale[] = { "    IMPOSTAZIONI", // Intestazione e voci del menù principale
-		"Data/Ora    ", "Imposta Luci", "Temperatura ", "Info Luci   " };
-
-char* VociMenuluci[] = {
-		"    IMPOSTA LUCI",       // Intestazione e voci del menu luci
-		"Fotoperiodo L1 ", "Fotoperiodo L2 ", "Fotoperiodo L3 ",
-		"Funz/LMax Linee", };
+// Intestazione e voci del menù principale
+char* VociMenuPrincipale[] = { "    IMPOSTAZIONI", "Data/Ora    ", "Imposta Luci", "Temperatura ", "Info Luci   " };
+// Intestazione e voci del menu luci
+char* VociMenuluci[] = {"    IMPOSTA LUCI",	"Fotoperiodo L1 ", "Fotoperiodo L2 ", "Fotoperiodo L3 ", "Funz/LMax Linee", };
 
 byte Menuprincipale, MenuLuci;
 //boolean Impostazioni, Luci;
@@ -333,17 +342,17 @@ void MJAcquariumCOntroller::inizializzaClock() {
 
 }
 
-/*
- funzione che formatta per stampa su LCD di data e ora
+/**
+ * funzione che formatta per stampa su LCD di data e ora
  */
 String MJAcquariumCOntroller::getDate() {
-	String txt = printDigit(this->now.Day()) + TXT_BARRA;
-	txt += printDigit(this->now.Month()) + TXT_BARRA;
+	String txt = printDigit(this->now.Day()) + *TXT_BARRA;
+	txt += printDigit(this->now.Month()) + *TXT_BARRA;
 	txt += printDigit(this->now.Year());
-	txt += TXT_SPAZIO;
-	txt += TXT_SPAZIO;
-	txt += printDigit(this->now.Hour()) + TXT_DUEPUNTI;
-	txt += printDigit(this->now.Minute()) + TXT_DUEPUNTI;
+	txt += *TXT_SPAZIO;
+	txt += *TXT_SPAZIO;
+	txt += printDigit(this->now.Hour()) + *TXT_DUEPUNTI;
+	txt += printDigit(this->now.Minute()) + *TXT_DUEPUNTI;
 	txt += printDigit(this->now.Second());
 
 #ifdef  DEBUG
@@ -357,7 +366,8 @@ String MJAcquariumCOntroller::getDate() {
 
 MJAcquariumCOntroller mjAcquariumController;
 
-void FunzionamentoNormale() {
+void FunzionamentoNormale()
+{
 	if (tasto == tok) {
 		avvio = true;
 		menu = tImp;
@@ -409,16 +419,12 @@ void setup() {
 	pinMode(PIN_PWM_LINEA_LUCI_2, OUTPUT); // PWM linea luci 2
 	pinMode(PIN_PWM_LINEA_LUCI_3, OUTPUT); // PWM linea luci 3
 
-	//read_pcf(keyboard);
-	//attachInterrupt(0, statotasto, FALLING);
-
 	Plafo[0].Powerline = rele2;
 	Plafo[1].Powerline = rele3;
 	Plafo[2].Powerline = rele4;
-
-	Plafo[0].NrPin = 3;
-	Plafo[1].NrPin = 5;
-	Plafo[2].NrPin = 6;
+	Plafo[0].NrPin = PIN_PWM_LINEA_LUCI_1;
+	Plafo[1].NrPin = PIN_PWM_LINEA_LUCI_2;
+	Plafo[2].NrPin = PIN_PWM_LINEA_LUCI_3;
 
 	Tempmod = true;
 

@@ -22,3 +22,63 @@ Data:       1299 bytes (63.4% Full)
 25070
 25092
 25036
+
+Program:   24768 bytes (75.6% Full)
+(.text + .data + .bootloader)
+
+Data:       1290 bytes (63.0% Full)
+(.data + .bss + .noinit)
+
+Program:   24610 bytes (75.1% Full)
+(.text + .data + .bootloader)
+
+Data:       1290 bytes (63.0% Full)
+(.data + .bss + .noinit)
+
+La scheda ad ogni modo servirà per accendere o spengere:
+Rel 1  - Riscaldatori
+Rel 2  - Alimentatore linea luci 1 (alim. separate per non avere un black-out totale in caso di guasto)
+Rel 3  - Alimentatore linea luci 2 (alim. separate per non avere un black-out totale in caso di guasto)
+Rel 4  - Alimentatore linea luci 3 (alim. separate per non avere un black-out totale in caso di guasto)
+Rel 5  - Elettrovalvola  e per i cambi parziali (Scarico)
+Rel 6  - Elettrovalvola  e per i cambi parziali (Carico)
+Rel 7  - Elettrovalvola per la CO2
+Rel 8  - Varie ed eventuali
+
+Ecco come attualmente nel progetto, sono impegnati i pin di Arduino.
+
+Digitali
+
+0 - Libero
+1 - Libero
+  2 - Al piedino INT del PCF con cui vengono letti i tasti (ancora non sfruttato via SW)
+  2 - Libero
+3 - PWM della linea 1 delle luci
+4 - One Wire - Sensori di temperatura DS18B20
+5 - PWM della linea 2 delle luci
+6 - PWM della linea 3 delle luci
+7 - Buzzer
+8 - Libero
+9 - Libero
+10 - Libero
+11 - Libero
+12 - Libero
+13 - Libero
+
+Analogici
+
+A0 - Libero
+A1 - Libero
+A2 - Libero
+A3 - Libero
+A4/SDA - SDA dell'I2C
+A5/SCL - SCL dell'I2C
+
+Altri
+
+Aref - Non utilizzato
+Reset - Non utilizzato
+GND - Connesso alla gnd della bread
+5V - Non utilizzato
+3,3V - Non utilizzato
+Vin - 12V

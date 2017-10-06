@@ -69,13 +69,13 @@ void ImpostaData()   // Funzione per impostazione data
 	//stampadataora(giorno, mese, anno, ora, minuti, secondi);
 	lcd.setCursor(0, 1);
 	lcd.print(printDigit(giornoimp));
-	lcd.print(TXT_BARRA);
+	lcd.print(*TXT_BARRA);
 	lcd.print(printDigit(meseimp));
-	lcd.print(TXT_BARRA);
+	lcd.print(*TXT_BARRA);
 	lcd.print(annoimp);
 	lcd.setCursor(12, 1);
 	lcd.print(printDigit(oraimp));
-	lcd.print(TXT_DUEPUNTI);
+	lcd.print(*TXT_DUEPUNTI);
 	lcd.print(printDigit(minutiimp));
 
 	if (conferma == true) {

@@ -1,4 +1,5 @@
-void Cicalino() {
+void Cicalino()
+{
 	if (beep > 0 && millis() - lastCicalino > 30) {
 		if (statoBeep == 0)
 			digitalWrite(buzzer, HIGH);
