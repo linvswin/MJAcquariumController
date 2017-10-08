@@ -90,20 +90,20 @@ void Impostatempacqua()
 	}
 }
 
-/**
+
 void MantenimentoTempAcqua ()
 { 
-	if (Tempmod == true)  // Se la temperetura di mantenimento "Tempacqua" è stata modificata, leggo il nuovo valore in memoria.
+	/*if (Tempmod == true)  // Se la temperetura di mantenimento "Tempacqua" è stata modificata, leggo il nuovo valore in memoria.
 	{
-		*settings.Tempacqua = (EEPROM.read(Tempind)) * 0.5;
+		//*settings.Tempacqua = (EEPROM.read(Tempind)) * 0.5;
 		Tempmod = false;
-	}
+	}*/
 
-	if (mjAcquariumController.getTemp() < *settings.Tempacqua) setpinpcf(schrele, rele1, 0);
+	if (mjAcquariumController.getTemp() < settings.Tempacqua) setpinpcf(schrele, rele1, 0);
 	else setpinpcf(schrele, rele1, 1);
 
 	lcd.setCursor(3, 2);
-	if ((mjAcquariumController.getTemp() < *settings.Tempacqua - temprange) || (mjAcquariumController.getTemp() > *settings.Tempacqua + temprange))
+	if ((mjAcquariumController.getTemp() < settings.Tempacqua - temprange) || (mjAcquariumController.getTemp() > settings.Tempacqua + temprange))
 	{
 		statoalrm = 1;
 		if (tasto == tesc) alrmsonoro = false;
@@ -122,7 +122,7 @@ void MantenimentoTempAcqua ()
 			}
 
 			if (statoalrm == 0) lcd.print(F("       "));*/
-		/*}
+		}
 
 		if (alrmsonoro == true) beep = 1;
 	} else {
@@ -134,4 +134,4 @@ void MantenimentoTempAcqua ()
 			alrmsonoro = true;
 		}
 	}
-}*/
+}

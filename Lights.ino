@@ -325,16 +325,11 @@ void InfoLuci()
 		lcd.print(F("L"));
 		lcd.print(linea + 1);
 		lcd.print(*TXT_DUEPUNTI);
-
 		lcd.print( ( settings.Plafo[linea].StatoPower == false)? TXT_OFF : TXT_ON );
-
 		lcd.print(F(" Fad:"));
-		// int perc = (Plafo[linea].Fading * 100) / Plafo[linea].MaxFading;
-		//lcd.print(perc);
 		lcd.print( (settings.Plafo[linea].Fading * 100) / settings.Plafo[linea].MaxFading );
 		lcd.print(TXT_PERCENTUALE);
 		lcd.setCursor(17, linea + 1);
-
 		lcd.print( (settings.Plafo[linea].Funzionamento == 2 ? F("A") : F("M")) );
 	}
 	if (tasto == tesc)

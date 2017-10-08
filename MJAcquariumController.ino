@@ -141,8 +141,8 @@ struct Dati Appoggio[3];// Serve come appoggio dei dati durante la loro impostaz
 // Dichiarazioni per periferiche collegate ai PCF //
 ////////////////////////////////////////////////////
 byte riscaldatore;
-//const int keyboard = 0x21; //PCF8574AP A0 VCC A1,A2 GND
-const int schrele = 0x3A;  //PCF8574AP A0 GND, A1 VCC, A2 GND
+//const int schrele = 0x3A;  //PCF8574AP A0 GND, A1 VCC, A2 GND
+const int schrele = 0x22;
 
 // Indirizzi dei pin del PCF dedicato alla scheda relé
 //#define rele1		0x1		//Termostato
@@ -160,7 +160,7 @@ const byte rele4 = 0x8;  //Alimentazione linea 3 Luci
  const byte rele8 = 0x80;*/
 
 byte appoggio; //, tasto;
-volatile boolean counter = false;
+//volatile boolean counter = false;
 boolean rstpcf;
 
 enum Tasti { tNull, tsx, tdx, tinc, tdec, tok, tesc };
@@ -207,8 +207,10 @@ boolean conferma, initfunc;
 #define COLS  4  // Four columns
 
 const char keys[ROWS][COLS] = { // Define the Keymap
-		{ '1', '2', '3', 'A' }, { '4', '5', '6', 'B' }, { '7', '8', '9', 'C' },
-				{ '*', '0', '#', 'D' } };
+		{ '1', '2', '3', 'A' },
+		{ '4', '5', '6', 'B' },
+		{ '7', '8', '9', 'C' },
+		{ '*', '0', '#', 'D' } };
 
 #define I2C_ADDR_KEYPAD 0x21 //keypad
 byte rowPins[ROWS] = { 3, 2, 1, 0 }; //connect to the row pinouts of the keypad
@@ -239,63 +241,14 @@ LiquidCrystal_I2C lcd(I2C_ADDR_LCD, En_pin, Rw_pin, Rs_pin, D4_pin, D5_pin,	D6_p
 byte frecciaalto[8] = {B00100,B01110,B11111,B00000,B00000,B00000,B00000,B00000 };
 
 
-void keypadEvent(KeypadEvent eKey) {
-	//Serial.println(eKey);
-
-#ifdef DEBUG
-#ifdef DEBUG_KEY
-	Serial.print(F("Tasto: "));
-	Serial.println(eKey);
-	lcd.setCursor(0, 2);
-	lcd.print(eKey);
-#endif
-#endif
-
-	switch (keypad.getState()) {
-	case PRESSED:
-		lcd.backlight();
-
-		switch (eKey) {
-		case '#':
-			tasto = tok;
-			break;
-		case '*':                 //* is to reset password attempt
-			tasto = tesc;
-			menu=tHome;
-			initfunc = true;
-			break;
-		case 'A':
-			break;
-		case 'B':
-			//tasto = tok;
-			break;
-		case '6':
-			tasto = tdx;
-			break;
-		case '4':
-			tasto = tsx;
-			break;
-		case '2':
-			tasto = tdec;
-			break;
-		case '8':
-			tasto = tinc;
-			break;
-		case 'D':
-			lcd.noBacklight();
-			break;
-		default:
-			break;
-		}
-	}
-}
 
 
 class MJAcquariumCOntroller {
 public:
-
+#include <Wire.h>
 	RtcDS3231 RTC;
-	//RtcDS3231<TwoWire> Rtc(Wire);
+	//RtcDS3231<TwoWire> RTC(Wire);
+	//RtcDS3231<TwoWire> RTC;
 	RtcDateTime now;
 	MandJTimer t;
 
@@ -313,7 +266,6 @@ public:
 	void loadSettings();
 };
 
-
 void MJAcquariumCOntroller::inizializza() {
 	//this->saveSettings();
 	this->loadSettings();
@@ -325,9 +277,9 @@ void MJAcquariumCOntroller::inizializza() {
 	this->inizializzaSensoreTemp();
 }
 
-
 void MJAcquariumCOntroller::inizializzaClock() {
 	//Adding time
+	//this->RTC=RtcDS3231<TwoWire> Rtc(Wire);
 	this->RTC.Begin();
 	RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
 	if (!this->RTC.IsDateTimeValid())
@@ -350,7 +302,6 @@ void MJAcquariumCOntroller::inizializzaClock() {
 
 }
 
-
 void MJAcquariumCOntroller::inizializzaSensoreTemp(){
 	this->sensors.setOneWire(&OneWire(ONE_WIRE_BUS));
 	this->sensors.begin();
@@ -365,12 +316,10 @@ void MJAcquariumCOntroller::inizializzaSensoreTemp(){
 	}
 }
 
-
 float MJAcquariumCOntroller::getTemp(){
 	this->sensors.requestTemperatures();
 	return ((this->sensors.getTempC(this->Termometro[0]) + this->sensors.getTempC(this->Termometro[1])) / 2);
 }
-
 
 void MJAcquariumCOntroller::saveSettings(void) {
 	byte* p = (byte*) &settings;
@@ -524,8 +473,8 @@ void setup() {
 	mjAcquariumController.t.startTimer();
 	mjAcquariumController.inizializza();
 	//timerPrintStandby=mjAcquariumController.t.every(1, standby);
-	//timerLCDbacklight = mjAcquariumController.t.every(settings.lcdBacklightTime, timerDoLCDbacklight);
-	timerLCDbacklight = mjAcquariumController.t.every(60, timerDoLCDbacklight);
+	timerLCDbacklight = mjAcquariumController.t.every(settings.lcdBacklightTime, timerDoLCDbacklight);
+	//timerLCDbacklight = mjAcquariumController.t.every(60, timerDoLCDbacklight);
 
 	for (byte i = 0; i <= 2; i++) {
 		Statoluci(i);
@@ -540,11 +489,11 @@ void loop() {
 	keypad.getKey();
 	mjAcquariumController.now = mjAcquariumController.RTC.GetDateTime();
 
-	/*Cicalino();
+	Cicalino();
 	GestioneLuci(Linea1);
 	GestioneLuci(Linea2);
 	GestioneLuci(Linea3);
-	MantenimentoTempAcqua();*/
+	MantenimentoTempAcqua();
 
 	//if (Home == true)
 	switch (menu) {
@@ -552,7 +501,7 @@ void loop() {
 		FunzionamentoNormale();
 		break;
 	case tImp:
-		mjAcquariumController.t.stop(timerPrintStandby);
+		//mjAcquariumController.t.stop(timerPrintStandby);
 		switch (Menuprincipale) {
 		case 0:
 			Scorrimenu(Menuprincipale, 6, VociMenuPrincipale);
@@ -631,3 +580,55 @@ String printDigit(int digits) {
 	return temp;
 }
 
+void keypadEvent(KeypadEvent eKey) {
+	//Serial.println(eKey);
+
+#ifdef DEBUG
+#ifdef DEBUG_KEY
+	Serial.print(F("Tasto: "));
+	Serial.println(eKey);
+	lcd.setCursor(0, 2);
+	lcd.print(eKey);
+#endif
+#endif
+
+	switch (keypad.getState()) {
+	case PRESSED:
+		lcd.backlight();
+	 	mjAcquariumController.t.stop(timerLCDbacklight);
+		timerLCDbacklight = mjAcquariumController.t.every(settings.lcdBacklightTime,timerDoLCDbacklight);
+
+		switch (eKey) {
+		case '#':
+			tasto = tok;
+			break;
+		case '*':                 //* is to reset password attempt
+			tasto = tesc;
+			menu=tHome;
+			initfunc = true;
+			break;
+		case 'A':
+			break;
+		case 'B':
+			//tasto = tok;
+			break;
+		case '6':
+			tasto = tdx;
+			break;
+		case '4':
+			tasto = tsx;
+			break;
+		case '2':
+			tasto = tdec;
+			break;
+		case '8':
+			tasto = tinc;
+			break;
+		case 'D':
+			lcd.noBacklight();
+			break;
+		default:
+			break;
+		}
+	}
+}

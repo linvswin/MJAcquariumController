@@ -1,7 +1,7 @@
-void statotasto()
+/*void statotasto()
 { 
   counter = !counter;
-}
+}*/
 
 byte read_pcf(int indirizzo)
 { 
