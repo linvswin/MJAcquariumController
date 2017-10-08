@@ -37,9 +37,9 @@ void ImpostaFunzLinee()
 	{
 		for (byte linea = 0; linea <= 2; linea++)	//Carico i dati in una struct di appoggio
 		{
-			IndBase = (linea * 12) + 11;
-			Appoggio[linea].Funzionamento = EEPROM.read(IndBase);
-			Appoggio[linea].MaxFading = EEPROM.read(IndBase + 1);
+			//IndBase = (linea * 12) + 11;
+			Appoggio[linea].Funzionamento = settings.Plafo[linea].Funzionamento; 	//EEPROM.read(IndBase);
+			Appoggio[linea].MaxFading = settings.Plafo[linea].MaxFading;			//EEPROM.read(IndBase + 1);
 		}
 		linea = 0;
 		lcd.clear();	//Scrivo su display le cose fisse
@@ -109,18 +109,18 @@ void ImpostaFunzLinee()
 			{
 				for (byte i = 0; i <= 2; i++)	//Salvataggio dei dati solo se cambiati e caricamento degli stessi nella struct principale
 				{
-					IndBase = (i * 12) + 11;
-					if (Appoggio[i].MaxFading != Plafo[i].MaxFading)
+					//IndBase = (i * 12) + 11;
+					if (Appoggio[i].MaxFading != settings.Plafo[i].MaxFading)
 					{
-						EEPROM.write(IndBase + 1, Appoggio[i].MaxFading);
-						Plafo[i].MaxFading = Appoggio[i].MaxFading;
-						Plafo[linea].Tempoprec = millis();
+						//EEPROM.write(IndBase + 1, Appoggio[i].MaxFading);
+						settings.Plafo[i].MaxFading = Appoggio[i].MaxFading;
+						settings.Plafo[linea].Tempoprec = millis();
 					}
-					if (Appoggio[i].Funzionamento != Plafo[i].Funzionamento)
+					if (Appoggio[i].Funzionamento != settings.Plafo[i].Funzionamento)
 					{
-						EEPROM.write(IndBase, Appoggio[i].Funzionamento);
-						Plafo[i].Funzionamento = Appoggio[i].Funzionamento;
-						if (Plafo[i].Funzionamento == 2) Statoluci(i);
+						//EEPROM.write(IndBase, Appoggio[i].Funzionamento);
+						settings.Plafo[i].Funzionamento = Appoggio[i].Funzionamento;
+						if (settings.Plafo[i].Funzionamento == 2) Statoluci(i);
 					}
 				}
 				menu=tHome;
@@ -155,29 +155,29 @@ unsigned long OrarioInSecondi (byte h, byte m) //Converte l'orario in secondi (d
 */
 void Statoluci(	byte linea)	
 {
-	IndBase = linea * 12;
-	Plafo[linea].Funzionamento = EEPROM.read(IndBase + 11);
-	if (Plafo[linea].Funzionamento == 2)
+	//IndBase = linea * 12;
+	//settings.Plafo[linea].Funzionamento = EEPROM.read(IndBase + 11);
+	if (settings.Plafo[linea].Funzionamento == 2)
 	{
-		Plafo[linea].OraOn = EEPROM.read(IndBase + 1);
-		Plafo[linea].MinOn = EEPROM.read(IndBase + 2);
-		Plafo[linea].OraOff = EEPROM.read(IndBase + 3);
-		Plafo[linea].MinOff = EEPROM.read(IndBase + 4);
-		Plafo[linea].OreFad = EEPROM.read(IndBase + 5);
-		Plafo[linea].MinFad = EEPROM.read(IndBase + 6);
-		Plafo[linea].OraFA = EEPROM.read(IndBase + 7);
-		Plafo[linea].MinFA = EEPROM.read(IndBase + 8);
-		Plafo[linea].OraIT = EEPROM.read(IndBase + 9);
-		Plafo[linea].MinIT = EEPROM.read(IndBase + 10);
-		Plafo[linea].MaxFading = EEPROM.read(IndBase + 12);
+		/*settings.Plafo[linea].OraOn = EEPROM.read(IndBase + 1);
+		settings.Plafo[linea].MinOn = EEPROM.read(IndBase + 2);
+		settings.Plafo[linea].OraOff = EEPROM.read(IndBase + 3);
+		settings.Plafo[linea].MinOff = EEPROM.read(IndBase + 4);
+		settings.Plafo[linea].OreFad = EEPROM.read(IndBase + 5);
+		settings.Plafo[linea].MinFad = EEPROM.read(IndBase + 6);
+		settings.Plafo[linea].OraFA = EEPROM.read(IndBase + 7);
+		settings.Plafo[linea].MinFA = EEPROM.read(IndBase + 8);
+		settings.Plafo[linea].OraIT = EEPROM.read(IndBase + 9);
+		settings.Plafo[linea].MinIT = EEPROM.read(IndBase + 10);
+		settings.Plafo[linea].MaxFading = EEPROM.read(IndBase + 12);*/
 
 		/** Calcolo degli orari di avvenimento degli eventi del fotoperiodo, in funzione dgli orari impostati
 		 *  ed in relazione al momento in cui avvengo nel corso delle 24 ore */
 		Temporeale = OrarioInSecondi(mjAcquariumController.now.Hour(), mjAcquariumController.now.Minute()) + (unsigned long) mjAcquariumController.now.Second();
-		Accensione = OrarioInSecondi(Plafo[linea].OraOn, Plafo[linea].MinOn);
-		Spegnimento = OrarioInSecondi(Plafo[linea].OraOff, Plafo[linea].MinOff);
-		Finealba = OrarioInSecondi(Plafo[linea].OreFad, Plafo[linea].MinFad);
-		Iniziotramonto = OrarioInSecondi(Plafo[linea].OraIT, Plafo[linea].MinIT);
+		Accensione = OrarioInSecondi(settings.Plafo[linea].OraOn, settings.Plafo[linea].MinOn);
+		Spegnimento = OrarioInSecondi(settings.Plafo[linea].OraOff, settings.Plafo[linea].MinOff);
+		Finealba = OrarioInSecondi(settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad);
+		Iniziotramonto = OrarioInSecondi(settings.Plafo[linea].OraIT, settings.Plafo[linea].MinIT);
 
 		/* Trasformazione degli orari calcolati sopra, in forma di tappe orarie in cui avvengono gli eventi, ripetto al momento di accensione
 		p.e. se alba inizia alle 10,00, il fading dura 2,00 ore e lo spegnimento avviene alle 22,00 le variabili diventeranno così:
@@ -195,118 +195,118 @@ void Statoluci(	byte linea)
 		Iniziotramonto = Spegnimento - Finealba; // Finealba corrisponde alla durata del Fading
 
 		// Calcolo dell'intervallo temporale tra l'incremento/decremento delle rampe durante alba/tramonto, espresso in millesimi di secondo
-		Plafo[linea].DeltaFading = (OrarioInSecondi(Plafo[linea].OreFad, Plafo[linea].MinFad) * 1000) / Plafo[linea].MaxFading;
+		settings.Plafo[linea].DeltaFading = (OrarioInSecondi(settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad) * 1000) / settings.Plafo[linea].MaxFading;
 
 		// Inizio dei controlli per scoprire in base all'ora attuale in quale momento del fotoperiodo della linea in questione mi trovo...
 		if (Temporeale > Spegnimento) // Se le luci sono spente
 		{
-			Plafo[linea].Alba = false;
-			Plafo[linea].Tramonto = false;
-			Plafo[linea].StatoPower = false;
-			analogWrite(Plafo[linea].NrPin, 0);				// Azzero il fading
-			setpinpcf(schrele, Plafo[linea].Powerline, 1);	// Spengo l'alimentatore della linea
+			settings.Plafo[linea].Alba = false;
+			settings.Plafo[linea].Tramonto = false;
+			settings.Plafo[linea].StatoPower = false;
+			analogWrite(settings.Plafo[linea].NrPin, 0);				// Azzero il fading
+			setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);	// Spengo l'alimentatore della linea
 		}else{ // Se l'ora attuale è all'interno del periodo di alba
 			if (Temporeale < Finealba)
 			{
-				Plafo[linea].Alba = true;
-				Plafo[linea].Tramonto = false;
-				Plafo[linea].Fading = (Temporeale * 1000) / Plafo[linea].DeltaFading; // Calcolo il valore di fading in base a Temporeale
+				settings.Plafo[linea].Alba = true;
+				settings.Plafo[linea].Tramonto = false;
+				settings.Plafo[linea].Fading = (Temporeale * 1000) / settings.Plafo[linea].DeltaFading; // Calcolo il valore di fading in base a Temporeale
 			} else {	// Se Temporeale è all'interno del periodo di luce piena
 				if (Temporeale < Iniziotramonto)
 				{
-					Plafo[linea].Alba = false;
-					Plafo[linea].Tramonto = false;
-					Plafo[linea].Fading = Plafo[linea].MaxFading;
+					settings.Plafo[linea].Alba = false;
+					settings.Plafo[linea].Tramonto = false;
+					settings.Plafo[linea].Fading = settings.Plafo[linea].MaxFading;
 				}else{ // Se temporeale è all'interno del periodo di tramonto
-					Plafo[linea].Alba = false;
-					Plafo[linea].Tramonto = true;
-					Plafo[linea].Fading = Plafo[linea].MaxFading - (((Temporeale - Iniziotramonto) * 1000) / Plafo[linea].DeltaFading); // Calcolo il valore di fading in base a Temporeale
+					settings.Plafo[linea].Alba = false;
+					settings.Plafo[linea].Tramonto = true;
+					settings.Plafo[linea].Fading = settings.Plafo[linea].MaxFading - (((Temporeale - Iniziotramonto) * 1000) / settings.Plafo[linea].DeltaFading); // Calcolo il valore di fading in base a Temporeale
 				}
 			}
 			// Comandi fissi se le luci non sono spente
-			setpinpcf(schrele, Plafo[linea].Powerline, 0);			//Alimento la linea led
-			analogWrite(Plafo[linea].NrPin, Plafo[linea].Fading);	//Setto la luminosità della linea in base al fading calcolato
-			Plafo[linea].Tempoprec = millis();						//Valore necessario in gestione luci per scandire il fading
-			Plafo[linea].StatoPower = true;							//Flag per la verifica dello stato di alimentazione della linea
+			setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);			//Alimento la linea led
+			analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);	//Setto la luminosità della linea in base al fading calcolato
+			settings.Plafo[linea].Tempoprec = millis();						//Valore necessario in gestione luci per scandire il fading
+			settings.Plafo[linea].StatoPower = true;							//Flag per la verifica dello stato di alimentazione della linea
 		}
 	}
 }
 
 void GestioneLuci (byte linea)
 { 
-	switch (Plafo[linea].Funzionamento)
+	switch (settings.Plafo[linea].Funzionamento)
 	{
 		case 0:								// Se è stato impostato OFF manuale
-			if (Plafo[linea].Fading == 0)	// Se sono arrivato al fading minimo e sono in OFF manuale disattivo lo switch
+			if (settings.Plafo[linea].Fading == 0)	// Se sono arrivato al fading minimo e sono in OFF manuale disattivo lo switch
 			{
-				Plafo[linea].Funzionamento = 3;
-				setpinpcf(schrele, Plafo[linea].Powerline, 1);
-				Plafo[linea].StatoPower = false;
+				settings.Plafo[linea].Funzionamento = 3;
+				setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);
+				settings.Plafo[linea].StatoPower = false;
 			}else{
-				if (((millis() - Plafo[linea].Tempoprec) >= 110) && (Plafo[linea].Fading > 0))
+				if (((millis() - settings.Plafo[linea].Tempoprec) >= 110) && (settings.Plafo[linea].Fading > 0))
 				{
-					Plafo[linea].Tempoprec = Plafo[linea].Tempoprec + 110;
-					Plafo[linea].Fading --;
-					analogWrite(Plafo[linea].NrPin, Plafo[linea].Fading);
+					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + 110;
+					settings.Plafo[linea].Fading --;
+					analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
 				}
 			}
 			break;
 		case 1:		// Se è stato impostato ON manuale
 			// Se sono arrivato al fading massimo e sono in ON manuale disattivo lo switch
-			if (Plafo[linea].Fading == Plafo[linea].MaxFading) Plafo[linea].Funzionamento = 3;
+			if (settings.Plafo[linea].Fading == settings.Plafo[linea].MaxFading) settings.Plafo[linea].Funzionamento = 3;
 			else{
-				setpinpcf(schrele, Plafo[linea].Powerline, 0);		// come sopra, ma accendo.
-				Plafo[linea].StatoPower = true;
-				if (((millis() - Plafo[linea].Tempoprec) >= 110) && (Plafo[linea].Fading < Plafo[linea].MaxFading))
+				setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);		// come sopra, ma accendo.
+				settings.Plafo[linea].StatoPower = true;
+				if (((millis() - settings.Plafo[linea].Tempoprec) >= 110) && (settings.Plafo[linea].Fading < settings.Plafo[linea].MaxFading))
 				{
-					Plafo[linea].Tempoprec = Plafo[linea].Tempoprec + 110;
-					Plafo[linea].Fading ++;
-					analogWrite(Plafo[linea].NrPin, Plafo[linea].Fading);
+					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + 110;
+					settings.Plafo[linea].Fading ++;
+					analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
 				}
 			}
 			break;
 		case 2:
-			if (Plafo[linea].Alba == true)
+			if (settings.Plafo[linea].Alba == true)
 			{
-				if ((millis() - Plafo[linea].Tempoprec) >= Plafo[linea].DeltaFading)
+				if ((millis() - settings.Plafo[linea].Tempoprec) >= settings.Plafo[linea].DeltaFading)
 				{
-					Plafo[linea].Tempoprec = Plafo[linea].Tempoprec + Plafo[linea].DeltaFading;
-					if (Plafo[linea].Fading < Plafo[linea].MaxFading)
+					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + settings.Plafo[linea].DeltaFading;
+					if (settings.Plafo[linea].Fading < settings.Plafo[linea].MaxFading)
 					{
-						Plafo[linea].Fading += 1;
-						analogWrite(Plafo[linea].NrPin, Plafo[linea].Fading);
-					}else Plafo[linea].Alba = false;
+						settings.Plafo[linea].Fading += 1;
+						analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
+					}else settings.Plafo[linea].Alba = false;
 				}
 			}else{
-				if (Plafo[linea].Tramonto == true)
+				if (settings.Plafo[linea].Tramonto == true)
 				{
-					if ((millis() - Plafo[linea].Tempoprec) >= Plafo[linea].DeltaFading)
+					if ((millis() - settings.Plafo[linea].Tempoprec) >= settings.Plafo[linea].DeltaFading)
 					{
-						Plafo[linea].Tempoprec = Plafo[linea].Tempoprec + Plafo[linea].DeltaFading;
-						if (Plafo[linea].Fading > 0)
+						settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + settings.Plafo[linea].DeltaFading;
+						if (settings.Plafo[linea].Fading > 0)
 						{
-							Plafo[linea].Fading -= 1;
-							analogWrite(Plafo[linea].NrPin, Plafo[linea].Fading);
+							settings.Plafo[linea].Fading -= 1;
+							analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
 						}else{
-							Plafo[linea].Tramonto = false;
-							setpinpcf(schrele, Plafo[linea].Powerline, 1);
-							Plafo[linea].StatoPower = false;
+							settings.Plafo[linea].Tramonto = false;
+							setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);
+							settings.Plafo[linea].StatoPower = false;
 						}
 					}
 				}else{
-					if ((Plafo[linea].OraOn == mjAcquariumController.now.Hour()) && (Plafo[linea].MinOn == mjAcquariumController.now.Minute()) && (Plafo[linea].Alba == false))
+					if ((settings.Plafo[linea].OraOn == mjAcquariumController.now.Hour()) && (settings.Plafo[linea].MinOn == mjAcquariumController.now.Minute()) && (settings.Plafo[linea].Alba == false))
 					{
-						Plafo[linea].Alba = true;
-						Plafo[linea].Tempoprec = millis();
-						Plafo[linea].Fading = 0;
-						setpinpcf(schrele, Plafo[linea].Powerline, 0);
-						Plafo[linea].StatoPower = true;
+						settings.Plafo[linea].Alba = true;
+						settings.Plafo[linea].Tempoprec = millis();
+						settings.Plafo[linea].Fading = 0;
+						setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);
+						settings.Plafo[linea].StatoPower = true;
 					}else{
-						if ((Plafo[linea].OraIT == mjAcquariumController.now.Hour()) && (Plafo[linea].MinIT == mjAcquariumController.now.Minute()) && (Plafo[linea].Tramonto == false))
+						if ((settings.Plafo[linea].OraIT == mjAcquariumController.now.Hour()) && (settings.Plafo[linea].MinIT == mjAcquariumController.now.Minute()) && (settings.Plafo[linea].Tramonto == false))
 						{
-							Plafo[linea].Tramonto = true;
-							Plafo[linea].Tempoprec = millis();
-							Plafo[linea].Fading = Plafo[linea].MaxFading;
+							settings.Plafo[linea].Tramonto = true;
+							settings.Plafo[linea].Tempoprec = millis();
+							settings.Plafo[linea].Fading = settings.Plafo[linea].MaxFading;
 						}
 					}
 				}
@@ -326,16 +326,16 @@ void InfoLuci()
 		lcd.print(linea + 1);
 		lcd.print(*TXT_DUEPUNTI);
 
-		lcd.print( ( Plafo[linea].StatoPower == false)? TXT_OFF : TXT_ON );
+		lcd.print( ( settings.Plafo[linea].StatoPower == false)? TXT_OFF : TXT_ON );
 
 		lcd.print(F(" Fad:"));
 		// int perc = (Plafo[linea].Fading * 100) / Plafo[linea].MaxFading;
 		//lcd.print(perc);
-		lcd.print( (Plafo[linea].Fading * 100) / Plafo[linea].MaxFading );
+		lcd.print( (settings.Plafo[linea].Fading * 100) / settings.Plafo[linea].MaxFading );
 		lcd.print(TXT_PERCENTUALE);
 		lcd.setCursor(17, linea + 1);
 
-		lcd.print( (Plafo[linea].Funzionamento == 2 ? F("A") : F("M")) );
+		lcd.print( (settings.Plafo[linea].Funzionamento == 2 ? F("A") : F("M")) );
 	}
 	if (tasto == tesc)
 	{
@@ -362,13 +362,13 @@ void ImpDatiFotoperiodo (byte linea)
 	byte OraOnOld, MinOnOld, OraOffOld, MinOffOld, OreFadOld, MinFadOld;
 	if (initfunc == true)						// Con questa if salvo le variabili interessate solo la prima volta che entro nell'impostazione
 	{
-		IndBase = linea * 12;				// in modo da poter poi salvare nella eprom solo i dati variati con le if di conferma
-		OraOnOld = Plafo[linea].OraOn;
-		MinOnOld = Plafo[linea].MinOn;
-		OraOffOld = Plafo[linea].OraOff;
-		MinOffOld = Plafo[linea].MinOff;
-		OreFadOld = Plafo[linea].OreFad;
-		MinFadOld = Plafo[linea].MinFad;
+		//IndBase = linea * 12;				// in modo da poter poi salvare nella eprom solo i dati variati con le if di conferma
+		OraOnOld = settings.Plafo[linea].OraOn;
+		MinOnOld = settings.Plafo[linea].MinOn;
+		OraOffOld = settings.Plafo[linea].OraOff;
+		MinOffOld = settings.Plafo[linea].MinOff;
+		OreFadOld = settings.Plafo[linea].OreFad;
+		MinFadOld = settings.Plafo[linea].MinFad;
 
 		initfunc = false;
 		Titoloimpostazionefotoperiodo = 1; // il valore di questa variabile determina il titolo della schermata
@@ -389,17 +389,17 @@ void ImpDatiFotoperiodo (byte linea)
 		lcd.setCursor(0, 1);
 		lcd.print(TXT_ACCLUNGSPG);
 		lcd.setCursor(0, 2);
-		stampa0(Plafo[linea].OraOn);
+		stampa0(settings.Plafo[linea].OraOn);
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(Plafo[linea].MinOn);
+		stampa0(settings.Plafo[linea].MinOn);
 		lcd.setCursor(7, 2);
 		stampa0(OreTot);
 		lcd.print(*TXT_DUEPUNTI);
 		stampa0(MinTot);
 		lcd.setCursor(14, 2);
-		stampa0(Plafo[linea].OraOff);
+		stampa0(settings.Plafo[linea].OraOff);
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(Plafo[linea].MinOff);
+		stampa0(settings.Plafo[linea].MinOff);
 	}
 
 	if (Titoloimpostazionefotoperiodo == 2)
@@ -409,9 +409,9 @@ void ImpDatiFotoperiodo (byte linea)
 		lcd.setCursor(0, 1);
 		lcd.print(TXT_DURFADLUCEMAX);
 		lcd.setCursor(0, 2);
-		stampa0(Plafo[linea].OreFad);
+		stampa0(settings.Plafo[linea].OreFad);
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(Plafo[linea].MinFad);
+		stampa0(settings.Plafo[linea].MinFad);
 		//lcd.setCursor(14, 2);
 		lcd.print(F("        "));
 		stampa0(OreLuceMax);
@@ -441,67 +441,67 @@ void ImpDatiFotoperiodo (byte linea)
 		case 1:        // immissione dell'ora di accensione, coincide con Ora Inizio Alba OraIA
 			stampafrecce(0);
 
-			OraOnPrec = Plafo[linea].OraOn;       // salvo OraOn iniziale
+			OraOnPrec = settings.Plafo[linea].OraOn;       // salvo OraOn iniziale
 			OreTotPrec = OreTot;         			// e ora totale fotoperiodo
 
-			if (tasto == tinc) SoglieCiclo(Plafo[linea].OraOn, 0, 23, 1);
-			if (tasto == tdec) SoglieCiclo(Plafo[linea].OraOn, 0, 23, 0);
+			if (tasto == tinc) SoglieCiclo(settings.Plafo[linea].OraOn, 0, 23, 1);
+			if (tasto == tdec) SoglieCiclo(settings.Plafo[linea].OraOn, 0, 23, 0);
 
-			TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
+			TotaliFtp (settings.Plafo[linea].OraOn, settings.Plafo[linea].MinOn, settings.Plafo[linea].OraOff, settings.Plafo[linea].MinOff, settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad);
 
 			if (Lucegiorno < 0) // Se è minore di 0 i valori si sono accavallati,
 			{
 				beep = 3;
-				Plafo[linea].OraOn = OraOnPrec; // i periodi si sono accavallati quindi riaggiorno le variabili ai vecchi valori
+				settings.Plafo[linea].OraOn = OraOnPrec; // i periodi si sono accavallati quindi riaggiorno le variabili ai vecchi valori
 				OreTot = OreTotPrec;
 			}
 			break;		// Chiude case 1 di DatoFotoperiodo per impostazione OraOn
 		case 2:	// immissione dei minuti dell'ora di accensione, coincide con Ora Inizio Alba OraIA
 			stampafrecce(3);
 
-			MinOnPrec = Plafo[linea].MinOn;
+			MinOnPrec = settings.Plafo[linea].MinOn;
 			MinTotPrec = MinTot;
 			OreTotPrec = OreTot;
 
-			if (tasto == tinc) SoglieCiclo(Plafo[linea].MinOn, 0, 59, 1);
-			if (tasto == tdec) SoglieCiclo(Plafo[linea].MinOn, 0, 59, 0);
+			if (tasto == tinc) SoglieCiclo(settings.Plafo[linea].MinOn, 0, 59, 1);
+			if (tasto == tdec) SoglieCiclo(settings.Plafo[linea].MinOn, 0, 59, 0);
 
-			TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
+			TotaliFtp (settings.Plafo[linea].OraOn, settings.Plafo[linea].MinOn, settings.Plafo[linea].OraOff, settings.Plafo[linea].MinOff, settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad);
 
 			if (Lucegiorno < 0)
 			{
 				beep = 3;
-				Plafo[linea].MinOn = MinOnPrec;
+				settings.Plafo[linea].MinOn = MinOnPrec;
 				OreTot = OreTotPrec;
 				MinTot = MinTotPrec;
 			}
 			break; // Chiude case 2 di DatoFotoperiodo per impostazione MinIA
 		case 3:
 			stampafrecce(14);
-			OraOffPrec = Plafo[linea].OraOff;
+			OraOffPrec = settings.Plafo[linea].OraOff;
 			OreTotPrec = OreTot;
-			if (tasto == tinc) SoglieCiclo(Plafo[linea].OraOff, 0, 23, 1);
-			if (tasto == tdec) SoglieCiclo(Plafo[linea].OraOff, 0, 23, 0);
-			TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
+			if (tasto == tinc) SoglieCiclo(settings.Plafo[linea].OraOff, 0, 23, 1);
+			if (tasto == tdec) SoglieCiclo(settings.Plafo[linea].OraOff, 0, 23, 0);
+			TotaliFtp (settings.Plafo[linea].OraOn, settings.Plafo[linea].MinOn, settings.Plafo[linea].OraOff, settings.Plafo[linea].MinOff, settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad);
 			if (Lucegiorno < 0)
 			{
 				beep = 3;
-				Plafo[linea].OraOff = OraOffPrec;
+				settings.Plafo[linea].OraOff = OraOffPrec;
 				OreTot = OreTotPrec;
 			}
 			break; // Chiude case 3 di DatoFotoperiodo per impostazione OraTFtp
 		case 4:
 			stampafrecce(17);
-			MinOffPrec = Plafo[linea].MinOff;
+			MinOffPrec = settings.Plafo[linea].MinOff;
 			MinTotPrec = MinTot;
 			OreTotPrec = OreTot;
-			if (tasto == tinc) SoglieCiclo(Plafo[linea].MinOff, 0, 59, 1);
-			if (tasto == tdec) SoglieCiclo(Plafo[linea].MinOff, 0, 59, 0);
-			TotaliFtp (Plafo[linea].OraOn, Plafo[linea].MinOn, Plafo[linea].OraOff, Plafo[linea].MinOff, Plafo[linea].OreFad, Plafo[linea].MinFad);
+			if (tasto == tinc) SoglieCiclo(settings.Plafo[linea].MinOff, 0, 59, 1);
+			if (tasto == tdec) SoglieCiclo(settings.Plafo[linea].MinOff, 0, 59, 0);
+			TotaliFtp (settings.Plafo[linea].OraOn, settings.Plafo[linea].MinOn, settings.Plafo[linea].OraOff, settings.Plafo[linea].MinOff, settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad);
 			if (Lucegiorno < 0)
 			{
 				beep = 3;
-				Plafo[linea].MinOff = MinOffPrec;
+				settings.Plafo[linea].MinOff = MinOffPrec;
 				OreTot = OreTotPrec;
 				MinTot = MinTotPrec;
 			}
@@ -514,10 +514,10 @@ void ImpDatiFotoperiodo (byte linea)
 				if (tasto == tok)		// alla seconda pressione del tasto ok aggiorno le variabili in memoria, ma solo quelle affettivamente cambiate
 				{	// La variazione di questi valori comporta anche il ricalcolo a secondo dei casi delle variabili di inizio
 					// alba e tramonto quindi anche queste vanno ricalcolate e memorizzate. vedi ultime due if
-					if (Plafo[linea].OraOn != OraOnOld) EEPROM.write((IndBase + 1), Plafo[linea].OraOn);
-					if (Plafo[linea].MinOn != MinOnOld) EEPROM.write((IndBase + 2), Plafo[linea].MinOn);
-					if (Plafo[linea].OraOff != OraOffOld) EEPROM.write((IndBase + 3), Plafo[linea].OraOff);
-					if (Plafo[linea].MinOff != MinOffOld) EEPROM.write((IndBase + 4), Plafo[linea].MinOff);
+					/*if (settings.Plafo[linea].OraOn != OraOnOld) EEPROM.write((IndBase + 1), settings.Plafo[linea].OraOn);
+					if (settings.Plafo[linea].MinOn != MinOnOld) EEPROM.write((IndBase + 2), settings.Plafo[linea].MinOn);
+					if (settings.Plafo[linea].OraOff != OraOffOld) EEPROM.write((IndBase + 3), settings.Plafo[linea].OraOff);
+					if (settings.Plafo[linea].MinOff != MinOffOld) EEPROM.write((IndBase + 4), settings.Plafo[linea].MinOff);*/
 					Statoluci(linea);
 					// agggiorno le variabili che mi servono per spostare l'immisione dati alla parte riguardante l'mmissione della durata dell'alba
 
@@ -538,14 +538,14 @@ void ImpDatiFotoperiodo (byte linea)
 			break; // Chiude case 5 di DatoFotoperiodo per registrazione dati in memoria
 		case 6:
 			stampafrecce(0);
-			OreFadPrec = Plafo[linea].OreFad;
-			if (tasto == tinc)SoglieCiclo(Plafo[linea].OreFad, 0, 23, 1);
-			if (tasto == tdec) SoglieCiclo(Plafo[linea].OreFad, 0, 23, 0);
-			Lucegiorno = LucePiena (OreTot, MinTot, Plafo[linea].OreFad, Plafo[linea].MinFad); // Calcolo l'intervallo di tempo di luce piena in minuti
+			OreFadPrec = settings.Plafo[linea].OreFad;
+			if (tasto == tinc)SoglieCiclo(settings.Plafo[linea].OreFad, 0, 23, 1);
+			if (tasto == tdec) SoglieCiclo(settings.Plafo[linea].OreFad, 0, 23, 0);
+			Lucegiorno = LucePiena (OreTot, MinTot, settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad); // Calcolo l'intervallo di tempo di luce piena in minuti
 			if (Lucegiorno < 0)
 			{
 				beep = 3;
-				Plafo[linea].OreFad = OreFadPrec;
+				settings.Plafo[linea].OreFad = OreFadPrec;
 			}else{
 				OreLuceMax = Lucegiorno / 60;
 				MinLuceMax = Lucegiorno - (OreLuceMax * 60);
@@ -554,15 +554,15 @@ void ImpDatiFotoperiodo (byte linea)
 		case 7:
 			stampafrecce(4);
 			//lcd.print(F("               "));
-			MinFadPrec = Plafo[linea].MinFad;
+			MinFadPrec = settings.Plafo[linea].MinFad;
 
-			if (tasto == tinc) SoglieCiclo(Plafo[linea].MinFad, 0, 59, 1);
-			if (tasto == tdec) SoglieCiclo(Plafo[linea].MinFad, 0, 59, 0);
-			Lucegiorno = LucePiena (OreTot, MinTot, Plafo[linea].OreFad, Plafo[linea].MinFad); // Calcolo l'intervallo di tempo di luce piena in minuti
+			if (tasto == tinc) SoglieCiclo(settings.Plafo[linea].MinFad, 0, 59, 1);
+			if (tasto == tdec) SoglieCiclo(settings.Plafo[linea].MinFad, 0, 59, 0);
+			Lucegiorno = LucePiena (OreTot, MinTot, settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad); // Calcolo l'intervallo di tempo di luce piena in minuti
 			if (Lucegiorno < 0)
 			{
 				beep = 3;
-				Plafo[linea].MinFad = MinFadPrec;
+				settings.Plafo[linea].MinFad = MinFadPrec;
 			}else{
 				OreLuceMax = Lucegiorno / 60;
 				MinLuceMax = Lucegiorno - (OreLuceMax * 60);
@@ -575,12 +575,12 @@ void ImpDatiFotoperiodo (byte linea)
 			{
 				if (tasto == tok)
 				{
-					if (Plafo[linea].OreFad != OreFadOld) EEPROM.write((IndBase + 5), Plafo[linea].OreFad);
-					if (Plafo[linea].MinFad != MinFadOld) EEPROM.write((IndBase + 6), Plafo[linea].MinFad);
+					/*if (settings.Plafo[linea].OreFad != OreFadOld) EEPROM.write((IndBase + 5), settings.Plafo[linea].OreFad);
+					if (settings.Plafo[linea].MinFad != MinFadOld) EEPROM.write((IndBase + 6), settings.Plafo[linea].MinFad);*/
 
-					Oninmin = (Plafo[linea].OraOn * 60) + Plafo[linea].MinOn;       //Calcolo l'orario di accensione in minuti
-					Offinmin = (Plafo[linea].OraOff * 60) + Plafo[linea].MinOff;    //Calcolo l'orario di spegnimento in minuti
-					Fadeinmin = (Plafo[linea].OreFad * 60) + Plafo[linea].MinFad;   //Calcolo la durata del fading in minuti
+					Oninmin = (settings.Plafo[linea].OraOn * 60) + settings.Plafo[linea].MinOn;       //Calcolo l'orario di accensione in minuti
+					Offinmin = (settings.Plafo[linea].OraOff * 60) + settings.Plafo[linea].MinOff;    //Calcolo l'orario di spegnimento in minuti
+					Fadeinmin = (settings.Plafo[linea].OreFad * 60) + settings.Plafo[linea].MinFad;   //Calcolo la durata del fading in minuti
 
 					//  Calcolo ora e minuti di inizio tramonto
 					ITinmin = Offinmin - Fadeinmin;
@@ -588,20 +588,20 @@ void ImpDatiFotoperiodo (byte linea)
 					if (ITinmin < 0)					//Per calcolare l'orario di inizio tramonto, eseguo la differenza tra durata di fading e spegnimento entrambe in minuti
 						ITinmin = ITinmin + 1440;		//ma bisogna tener conto degli orari dopo la mezzanotte, quindi eseguire i calcoli in base ai casi che si possono presentare
 
-					Plafo[linea].OraIT = ITinmin / 60;
-					Plafo[linea].MinIT = ITinmin - (Plafo[linea].OraIT * 60);
+					settings.Plafo[linea].OraIT = ITinmin / 60;
+					settings.Plafo[linea].MinIT = ITinmin - (settings.Plafo[linea].OraIT * 60);
 					//  Calcolo ora e minuti di inizio alba
 					FAinmin = Oninmin + Fadeinmin;
 
 					if (FAinmin > 1440) FAinmin = FAinmin - 1440;
 
-					Plafo[linea].OraFA = FAinmin / 60;
-					Plafo[linea].MinFA = FAinmin - (Plafo[linea].OraFA * 60);
+					settings.Plafo[linea].OraFA = FAinmin / 60;
+					settings.Plafo[linea].MinFA = FAinmin - (settings.Plafo[linea].OraFA * 60);
 
-					EEPROM.write((IndBase + 7), Plafo[linea].OraFA);
-					EEPROM.write((IndBase + 8), Plafo[linea].MinFA);
-					EEPROM.write((IndBase + 9), Plafo[linea].OraIT);
-					EEPROM.write((IndBase + 10), Plafo[linea].MinIT);
+					/*EEPROM.write((IndBase + 7), settings.Plafo[linea].OraFA);
+					EEPROM.write((IndBase + 8), settings.Plafo[linea].MinFA);
+					EEPROM.write((IndBase + 9), settings.Plafo[linea].OraIT);
+					EEPROM.write((IndBase + 10), settings.Plafo[linea].MinIT);*/
 
 					Statoluci(linea);
 					conferma = true;

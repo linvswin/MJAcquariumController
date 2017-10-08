@@ -43,8 +43,7 @@ void stampafrecce(byte pos) // Creata per evidenziare i dati in aggiornamento se
 }
 
 void stampa0(int dato_tempo) {
-	if (dato_tempo < 10)
-		lcd.print(F("0"));
+	if (dato_tempo < 10) lcd.print(F("0"));
 	lcd.print(dato_tempo);
 }
 

@@ -24,22 +24,6 @@ byte bcdToDec(byte val) {
 	 anno = bcdToDec(Wire.read()) + 2000;
 }*/
 
-/*void stampadataora(byte gg, byte mm, int aa, byte hh, byte mi, byte ss)      // Creata per semplificare il codice dell'impostazione di data e ora
- {
- lcd.setCursor(0, 1);
- stampa0(gg);
- lcd.print(F("/"));
- stampa0(mm);
- lcd.print(F("/"));
- lcd.print(aa);
- lcd.print(F("  "));
- stampa0(hh);
- lcd.print(F(":"));
- stampa0(mi);
- lcd.print(F(":"));
- stampa0(ss);
- }*/
-
 uint8_t giornimese[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }; // creo un'array per il controllo sull'immisione dei giorni
 
 void ImpostaData()   // Funzione per impostazione data

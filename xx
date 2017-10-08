@@ -35,6 +35,36 @@ Program:   24610 bytes (75.1% Full)
 Data:       1290 bytes (63.0% Full)
 (.data + .bss + .noinit)
 
+Program:   24974 bytes (76.2% Full)
+(.text + .data + .bootloader)
+
+Data:       1297 bytes (63.3% Full)
+(.data + .bss + .noinit)
+
+Program:   25390 bytes (77.5% Full)
+(.text + .data + .bootloader)
+
+Data:       1476 bytes (72.1% Full)
+(.data + .bss + .noinit)
+
+rogram:   25494 bytes (77.8% Full)
+(.text + .data + .bootloader)
+
+Data:       1446 bytes (70.6% Full)
+(.data + .bss + .noinit)
+
+Program:   24342 bytes (74.3% Full)
+(.text + .data + .bootloader)
+
+Data:       1441 bytes (70.4% Full)
+(.data + .bss + .noinit)
+
+Program:   23958 bytes (73.1% Full)
+(.text + .data + .bootloader)
+
+Data:       1471 bytes (71.8% Full)
+(.data + .bss + .noinit)
+
 La scheda ad ogni modo servirà per accendere o spengere:
 Rel 1  - Riscaldatori
 Rel 2  - Alimentatore linea luci 1 (alim. separate per non avere un black-out totale in caso di guasto)
