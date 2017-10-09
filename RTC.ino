@@ -28,9 +28,6 @@ uint8_t giornimese[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }; // 
 
 void ImpostaData()   // Funzione per impostazione data
 {
-	//uint8_t giornoimp, meseimp, oraimp, minutiimp, secondiimp, datotempo;
-	//int annoimp;
-
 	if (initfunc == true)//If di inizializzazazione della procedura, viene eseguita na sola volta
 	{
 		giornoimp = mjAcquariumController.now.Day();

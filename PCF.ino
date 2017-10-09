@@ -1,20 +1,36 @@
-/*void statotasto()
+/*byte read_pcf(int indirizzo)
 { 
-  counter = !counter;
-}*/
-
-byte read_pcf(int indirizzo)
-{ 
-  byte statoIOpcf;
+  /*byte statoIOpcf;
   Wire.beginTransmission(indirizzo); // prima lettura per resettare il pcf ed attivare il piedino int
   Wire.requestFrom(indirizzo, 1);
   if (Wire.available())
     statoIOpcf = Wire.read();
   Wire.endTransmission();
-  return statoIOpcf;
-}
-/*
-void leggitasto()
+  return statoIOpcf;*/
+  //return pcfRele.read(indirizzo);
+/*}*/
+
+/*void setpinpcf(int indirizzo, byte pin, byte statopin)
+{
+	byte statoschrele = read_pcf(indirizzo);
+
+	if (statopin == HIGH) statoschrele = statoschrele | pin;
+	else statoschrele = statoschrele & ~pin;
+	//pcfRele.write(pin, statoschrele);
+
+	/*Wire.beginTransmission(indirizzo);
+	Wire.write(statoschrele);
+	Wire.endTransmission();*/
+/*}*/
+
+
+/*void statotasto()
+{
+  counter = !counter;
+}*/
+
+
+/*void leggitasto()
 { 
   if (counter)
   { 
@@ -84,18 +100,3 @@ void leggitasto()
 
 }
 */
-
-void setpinpcf(int indirizzo, byte pin, byte statopin)
-{ 
-  byte statoschrele = read_pcf(indirizzo);
-
-  if (statopin == HIGH)
-    statoschrele = statoschrele | pin;
-  else
-    statoschrele = statoschrele & ~pin;
-
-  Wire.beginTransmission(indirizzo);
-  Wire.write(statoschrele);
-  Wire.endTransmission();
-}
-

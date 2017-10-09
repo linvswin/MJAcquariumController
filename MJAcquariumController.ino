@@ -6,62 +6,22 @@
 #include <avr/wdt.h>
 
 #include <Keypad_I2C.h>
-#include <PCF8574_Class.h>
+//#include <PCF8574_Class.h>
 #include <RtcDS3231.h>
 #include <MandJTimer.h>
 
-#define BAUD_RATE  9600
-#define CLKDS3231
-
-// software reset
-#define Reset_AVR() wdt_enable(WDTO_30MS); while(1) {}
-
-#define TXT_CONFERMARE          F("*CONFERMARE*")
-#define TXT_IMP_TEMP_ACQUA      F("IMP. TEMP. ACQUA")
-#define TXT_TEMP                F("Temp.:")
-#define TXT_APP_NAME            F(" Aquarium Controller")
-#define TXT_UNABLE_FIND_DEVICE  F("Unable to find address for Device ")
-#define TXT_OFF                 F("Off")
-#define TXT_ON                  F("On ")
-#define TXT_AUTOMATICO          F("Aut")
-
-const char * TXT_DUEPUNTI=":";
-const char * TXT_BARRA="/";
-const char * TXT_SPAZIO=" ";
-const char * TXT_PERCENTUALE="%";
-
-#define TXT_INFOLUCI			F("     INFO LUCI      ")
-#define TXT_IMPDATAORA			F("Imp Data/Ora")
-#define TXT_IMPFOTOPERIODO		F("IMP.FOTOPERIODO L")
-#define TXT_ACCLUNGSPG			F("Acc.   Lung.  Spg.  ")
-#define TXT_IMPDURFADINGL		F("Imp. Dur. Fading L")
-#define TXT_DURFADLUCEMAX		F("Dur.Fad.    Luce Max")
-#define TXT_IMPFUNZLUMMAX		F("IMP. FUNZ. E LUM.MAX")
+#include "config.h"
 //#include "MJAcquariumController.h"
 
-float floatAppoVar=0.0;
 // Variabili per gestione RTC e impostazione data e ora //
-uint8_t giornoimp, meseimp, oraimp, minutiimp, secondiimp, datotempo;
+uint8_t giornoimp, meseimp, oraimp, minutiimp,datotempo;
 int annoimp;
-int annoold;
-//boolean Home;
 
-// Dichiarazioni per sensori di temperatura //
-#define MAX_TEMP_SENSOR   2
-#define ONE_WIRE_BUS 4
-#define TEMPERATURE_PRECISION 9
-
-//float Tempacqua,
-//float Tempacquaset,
-//float Tempvecchia;
-//byte Tempacquaint,
 byte Tempacquadec;
-//byte Tempind = 37;
-boolean Tempmod;
 unsigned long Tempolettura, TempoAttuale;
 unsigned long tempolettura = 5000;
 unsigned long tempoletturaprec = 0;
-const float temprange = 1.5;
+//const float temprange = 1.5;
 boolean alrmsonoro;
 unsigned long tmplampprec;
 byte statoalrm = 0;
@@ -71,9 +31,9 @@ byte statoalrm = 0;
 #define PIN_PWM_LINEA_LUCI_2  5
 #define PIN_PWM_LINEA_LUCI_3  6
 
-byte Linea1 = 0;
-byte Linea2 = 1;
-byte Linea3 = 2;
+/*byte Linea1 = 0; byte Linea2 = 1; byte Linea3 = 2;*/
+enum mjLinee{tLinea1,tLinea2,tLinea3};
+enum mjFunzionamento {tOff, tOn, tAuto};
 
 struct DatiLuci	//I valori di Pos, vengono usati per determinare l'indirizzo di memoria in cui vengono registrati gli orari
 {
@@ -99,11 +59,9 @@ struct DatiLuci	//I valori di Pos, vengono usati per determinare l'indirizzo di 
 	byte Powerline;				//Contiene l'indirizzo del pin del pcf che comanda la scheda relé
 };
 
-//struct DatiLuci Plafo[3];
-
 struct AcquariumSettings{
 	float Tempacqua;			//  Temperatura acqua
-	float TempDelta; 			//  Temparatura delta
+	float TempRange; 			//  Temparatura range
 	uint8_t lcdBacklightTime;	// durata retroilluminazione
 	DatiLuci Plafo[3];
 } settings = {
@@ -112,9 +70,6 @@ struct AcquariumSettings{
 	60,							// durata retroilluminazione
 };
 
-//struct AcquariumSettings settings;
-
-//byte OraOnOld, MinOnOld, OraOffOld, MinOffOld, OreFadOld, MinFadOld;
 byte OraOnPrec, OreTotPrec, MinOnPrec, MinTotPrec, OraOffPrec, MinOffPrec,
 		OreFadPrec, MinFadPrec, OreLuceMax, MinLuceMax; // Variabili per controlli variazione
 byte OreTot, MinTot, nrlinea;
@@ -123,8 +78,8 @@ byte DatoFotoperiodo, TipoFotoperiodo, acquisizionedatifotoperiodo,
 		Titoloimpostazionefotoperiodo, Parteimpostazione, LimitecaseInf,
 		LimitecaseSup;
 int Lucegiorno;
-//byte IndBase;
-byte linea, colonna;
+byte linea;
+//byte colonna;
 unsigned long Temporeale, Accensione, Spegnimento, Finealba, Iniziotramonto;
 
 struct Dati //Creo una struttura di variabili relative ad un Tasto
@@ -137,111 +92,27 @@ struct Dati Appoggio[3];// Serve come appoggio dei dati durante la loro impostaz
 //altrimenti il loop vedrebbe le variabili mentre cambiano
 // ed impazzirebbe
 
-////////////////////////////////////////////////////
-// Dichiarazioni per periferiche collegate ai PCF //
-////////////////////////////////////////////////////
-byte riscaldatore;
-//const int schrele = 0x3A;  //PCF8574AP A0 GND, A1 VCC, A2 GND
-const int schrele = 0x22;
-
-// Indirizzi dei pin del PCF dedicato alla scheda relé
-//#define rele1		0x1		//Termostato
-//#define rele2		0x2		//Alimentazione linea 1 Luci
-//#define rele3		0x4		//Alimentazione linea 2 Luci
-//#define rele4		0x8		//Alimentazione linea 3 Luci
-
-const byte rele1 = 0x1;  //Termostato
-const byte rele2 = 0x2;  //Alimentazione linea 1 Luci
-const byte rele3 = 0x4;  //Alimentazione linea 2 Luci
-const byte rele4 = 0x8;  //Alimentazione linea 3 Luci
-/*const byte rele5 = 0x10; // Per gli usi futuri
- const byte rele6 = 0x20;
- const byte rele7 = 0x40;
- const byte rele8 = 0x80;*/
-
-byte appoggio; //, tasto;
-//volatile boolean counter = false;
-boolean rstpcf;
-
-enum Tasti { tNull, tsx, tdx, tinc, tdec, tok, tesc };
-Tasti tasto;
-//unsigned long oldtasto;
-
-//////////////////////////////////////////
-// Dichiarazioni per i segnali acustici //
-//////////////////////////////////////////
-#define buzzer 7
-byte beep = 1;
-byte statoBeep = 0; //0 = low, 1 = high;
-uint32_t lastCicalino = millis();
-
-//////////////////////////////////////////////////////
-// Dichiarazioni per i menù e gestione degli stessi //
-//////////////////////////////////////////////////////
-enum tMenu {tHome, tImp, tLuci};
-tMenu menu;
-// Intestazione e voci del menù principale
-//char* VociMenuPrincipale[] = { "IMPOSTAZIONI", "Data/Ora", "Imposta Luci", "Temperatura", "Info Luci", "Salva" };
-// Intestazione e voci del menu luci
-//char* VociMenuluci[] = {"IMPOSTA LUCI",	"Fotoperiodo L1", "Fotoperiodo L2", "Fotoperiodo L3", "Funz/LMax Linee" };
-// Intestazione e voci del menù principale
-char* VociMenuPrincipale[] = { "    IMPOSTAZIONI",
-							   "Data/Ora    ",
-							   "Imposta Luci",
-							   "Temperatura ",
-							   "Info Luci   ",
-							   "Salva       ",
-							   "Carica      "};
-// Intestazione e voci del menu luci
-char* VociMenuluci[] = {"    IMPOSTA LUCI",	"Fotoperiodo L1 ", "Fotoperiodo L2 ", "Fotoperiodo L3 ", "Funz/LMax Linee", };
-
-byte Menuprincipale, MenuLuci;
-//boolean Impostazioni, Luci;
-boolean avvio;
-boolean stampato;
-byte funzionamento;
-boolean conferma, initfunc;
-
-//======================================
-#define ROWS  4  // Four rows
-#define COLS  4  // Four columns
-
-const char keys[ROWS][COLS] = { // Define the Keymap
-		{ '1', '2', '3', 'A' },
-		{ '4', '5', '6', 'B' },
-		{ '7', '8', '9', 'C' },
-		{ '*', '0', '#', 'D' } };
-
-#define I2C_ADDR_KEYPAD 0x21 //keypad
-byte rowPins[ROWS] = { 3, 2, 1, 0 }; //connect to the row pinouts of the keypad
-byte colPins[COLS] = { 7, 6, 5, 4 }; //connect to the column pinouts of the keypad
-
-Keypad_I2C keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2C_ADDR_KEYPAD, PCF8574);
-//======================================
-
-///////////////////////////////
-// Dichiarazioni per display //
-///////////////////////////////
-#define I2C_ADDR_LCD    0x20
-#define BACKLIGHT_PIN  7
-#define En_pin  4
-#define Rw_pin  5
-#define Rs_pin  6
-#define D4_pin  0
-#define D5_pin  1
-#define D6_pin  2
-#define D7_pin  3
-
-LiquidCrystal_I2C lcd(I2C_ADDR_LCD, En_pin, Rw_pin, Rs_pin, D4_pin, D5_pin,	D6_pin, D7_pin, BACKLIGHT_PIN, NEGATIVE);
-
-/**
- * vettore che contiene i dati per creare una freccia rivolta verso l'alto per evidenziare i dati
- * da impostare nei vari menu
- */
-byte frecciaalto[8] = {B00100,B01110,B11111,B00000,B00000,B00000,B00000,B00000 };
-
-
-
+/************ Sensori ************/
+#define I2C_RELE_ADDR 0x22
+// pin del PCF8574 connessi ai rele
+/*#define I2C_RELE1_PIN 0		//Termostato
+#define I2C_RELE2_PIN 1		//Alimentazione linea 1 Luci
+#define I2C_RELE3_PIN 2		//Alimentazione linea 2 Luci
+#define I2C_RELE4_PIN 3		//Alimentazione linea 3 Luci
+#define I2C_RELE5_PIN 4
+#define I2C_RELE6_PIN 5
+#define I2C_RELE7_PIN 6
+#define I2C_RELE8_PIN 7*/
+#define RELE1_PIN 13		//Termostato
+#define RELE2_PIN 12		//Alimentazione linea 1 Luci
+#define RELE3_PIN 10		//Alimentazione linea 2 Luci
+#define RELE4_PIN 9 		//Alimentazione linea 3 Luci
+//#define I2C_RELE5_PIN 8
+//#define I2C_RELE6_PIN 7
+//#define I2C_RELE7_PIN 6
+//#define I2C_RELE8_PIN 5
+/*===============================*/
+//PCF8574_Class pcfRele(I2C_RELE_ADDR);
 
 class MJAcquariumCOntroller {
 public:
@@ -264,6 +135,9 @@ public:
 
 	void saveSettings();
 	void loadSettings();
+
+	void MJAcquariumCOntroller::GestioneLuci (byte linea);
+	void setRele(uint8_t pin, uint8_t stato){digitalWrite(pin, stato);};
 };
 
 void MJAcquariumCOntroller::inizializza() {
@@ -327,7 +201,6 @@ void MJAcquariumCOntroller::saveSettings(void) {
 		EEPROM.write(i, p[i]);
 }
 
-
 void MJAcquariumCOntroller::loadSettings(void) {
 	byte* p = (byte*) &settings;
 	for (int i = 0; i < sizeof(AcquariumSettings); i++)
@@ -356,10 +229,99 @@ String MJAcquariumCOntroller::getDate() {
 	return txt;
 }
 
-int8_t timerPrintStandby=0,
-		timerLCDbacklight=0;
-MJAcquariumCOntroller mjAcquariumController;
+void MJAcquariumCOntroller::GestioneLuci (byte linea)
+{
+	switch (settings.Plafo[linea].Funzionamento)
+	{
+		case tOff:								// Se è stato impostato OFF manuale
+			if (settings.Plafo[linea].Fading == 0)	// Se sono arrivato al fading minimo e sono in OFF manuale disattivo lo switch
+			{
+				//settings.Plafo[linea].Funzionamento = 3;
+				//setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);
+				this->setRele(settings.Plafo[linea].Powerline, LOW);
+				settings.Plafo[linea].StatoPower = false;
+			}else{
+				if (((millis() - settings.Plafo[linea].Tempoprec) >= 110) && (settings.Plafo[linea].Fading > 0))
+				{
+					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + 110;
+					settings.Plafo[linea].Fading --;
+					analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
+				}
+			}
+			break;
+		case tOn:		// Se è stato impostato ON manuale
+			// Se sono arrivato al fading massimo e sono in ON manuale disattivo lo switch
+			if (settings.Plafo[linea].Fading == settings.Plafo[linea].MaxFading){
+				//settings.Plafo[linea].Funzionamento = 3;
+			}else{
+				//setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);		// come sopra, ma accendo.
+				this->setRele(settings.Plafo[linea].Powerline, HIGH);
+				settings.Plafo[linea].StatoPower = true;
+				if (((millis() - settings.Plafo[linea].Tempoprec) >= 110) && (settings.Plafo[linea].Fading < settings.Plafo[linea].MaxFading))
+				{
+					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + 110;
+					settings.Plafo[linea].Fading ++;
+					analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
+				}
+			}
+			break;
+		case tAuto:
+			if (settings.Plafo[linea].Alba == true)
+			{
+				if ((millis() - settings.Plafo[linea].Tempoprec) >= settings.Plafo[linea].DeltaFading)
+				{
+					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + settings.Plafo[linea].DeltaFading;
+					if (settings.Plafo[linea].Fading < settings.Plafo[linea].MaxFading)
+					{
+						settings.Plafo[linea].Fading += 1;
+						analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
+					}else settings.Plafo[linea].Alba = false;
+				}
+			}else{
+				if (settings.Plafo[linea].Tramonto == true)
+				{
+					if ((millis() - settings.Plafo[linea].Tempoprec) >= settings.Plafo[linea].DeltaFading)
+					{
+						settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + settings.Plafo[linea].DeltaFading;
+						if (settings.Plafo[linea].Fading > 0)
+						{
+							settings.Plafo[linea].Fading -= 1;
+							analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
+						}else{
+							settings.Plafo[linea].Tramonto = false;
+							//setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);
+							this->setRele(settings.Plafo[linea].Powerline, LOW);
+							settings.Plafo[linea].StatoPower = false;
+						}
+					}
+				}else{
+					if ((settings.Plafo[linea].OraOn == this->now.Hour()) && (settings.Plafo[linea].MinOn == this->now.Minute()) && (settings.Plafo[linea].Alba == false))
+					{
+						settings.Plafo[linea].Alba = true;
+						settings.Plafo[linea].Tempoprec = millis();
+						settings.Plafo[linea].Fading = 0;
+						//setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);
+						this->setRele(settings.Plafo[linea].Powerline, HIGH);
+						settings.Plafo[linea].StatoPower = true;
+					}else{
+						if ((settings.Plafo[linea].OraIT == this->now.Hour()) && (settings.Plafo[linea].MinIT == this->now.Minute()) && (settings.Plafo[linea].Tramonto == false))
+						{
+							settings.Plafo[linea].Tramonto = true;
+							settings.Plafo[linea].Tempoprec = millis();
+							settings.Plafo[linea].Fading = settings.Plafo[linea].MaxFading;
+						}
+					}
+				}
+			}
+			break;
+	}
+}
 
+int8_t timerPrintStandby=0,
+	   timerLCDbacklight=0,
+	   timerCheck=0;
+
+MJAcquariumCOntroller mjAcquariumController;
 
 void FunzionamentoNormale()
 {
@@ -389,7 +351,7 @@ void standby()
 	{
 		//lcd.clear();
 		// prima riga
-		lcd.setCursor(0, 0);
+		lcd.setCursor(1, 0);
 		lcd.print(TXT_APP_NAME);
 		// seconda riga
 		lcd.setCursor(0, 1);
@@ -397,7 +359,6 @@ void standby()
 		// terza riga
 		lcd.setCursor(0, 2);
 		lcd.print(F("T: "));
-		//tmed=mjAcquariumController.getTemp();
 		lcd.print(mjAcquariumController.getTemp());
 		lcd.write(0b011011111);
 		lcd.setCursor(12, 2);
@@ -426,6 +387,10 @@ void timerDoLCDbacklight() {
 	//lcd.noBacklight();
 }
 
+void timerDoCheck(){
+	MantenimentoTempAcqua();
+}
+
 void salva(){
 	if (initfunc == true)
 	{
@@ -450,23 +415,34 @@ void setup() {
 	Wire.begin();
 	Serial.begin(BAUD_RATE);
 
-	lcd.begin(20, 4);					// inizializzazione del display
-	lcd.createChar(0, frecciaalto); // creo la freccia verso l'alto usando i dati del vettore frecciaalto
-	lcd.backlight();
+	pinMode(RELE1_PIN, OUTPUT);
+	pinMode(RELE2_PIN, OUTPUT);
+	pinMode(RELE3_PIN, OUTPUT);
+	pinMode(RELE4_PIN, OUTPUT);
+
+	digitalWrite(RELE1_PIN,LOW);
+	digitalWrite(RELE2_PIN,LOW);
+	digitalWrite(RELE3_PIN,LOW);
+	digitalWrite(RELE4_PIN,LOW);
 
 	pinMode(buzzer, OUTPUT);
 	pinMode(PIN_PWM_LINEA_LUCI_1, OUTPUT); // PWM linea luci 1
 	pinMode(PIN_PWM_LINEA_LUCI_2, OUTPUT); // PWM linea luci 2
 	pinMode(PIN_PWM_LINEA_LUCI_3, OUTPUT); // PWM linea luci 3
 
-	settings.Plafo[0].Powerline = rele2;
-	settings.Plafo[1].Powerline = rele3;
-	settings.Plafo[2].Powerline = rele4;
+	lcd.begin(20, 4);					// inizializzazione del display
+	lcd.createChar(0, frecciaalto); // creo la freccia verso l'alto usando i dati del vettore frecciaalto
+	lcd.backlight();
+
+	settings.Plafo[0].Powerline = RELE2_PIN;
+	settings.Plafo[1].Powerline = RELE3_PIN;
+	settings.Plafo[2].Powerline = RELE4_PIN;
+
 	settings.Plafo[0].NrPin = PIN_PWM_LINEA_LUCI_1;
 	settings.Plafo[1].NrPin = PIN_PWM_LINEA_LUCI_2;
 	settings.Plafo[2].NrPin = PIN_PWM_LINEA_LUCI_3;
 
-	Tempmod = true;
+	//Tempmod = true;
 	menu = tHome;
 	conferma = true;
 
@@ -475,6 +451,7 @@ void setup() {
 	//timerPrintStandby=mjAcquariumController.t.every(1, standby);
 	timerLCDbacklight = mjAcquariumController.t.every(settings.lcdBacklightTime, timerDoLCDbacklight);
 	//timerLCDbacklight = mjAcquariumController.t.every(60, timerDoLCDbacklight);
+	timerCheck=mjAcquariumController.t.every(2, timerDoCheck);
 
 	for (byte i = 0; i <= 2; i++) {
 		Statoluci(i);
@@ -490,82 +467,52 @@ void loop() {
 	mjAcquariumController.now = mjAcquariumController.RTC.GetDateTime();
 
 	Cicalino();
-	GestioneLuci(Linea1);
-	GestioneLuci(Linea2);
-	GestioneLuci(Linea3);
-	MantenimentoTempAcqua();
+	mjAcquariumController.GestioneLuci(tLinea1);
+	mjAcquariumController.GestioneLuci(tLinea2);
+	mjAcquariumController.GestioneLuci(tLinea3);
+	//MantenimentoTempAcqua();
 
-	//if (Home == true)
 	switch (menu) {
-	case tHome:
-		FunzionamentoNormale();
-		break;
-	case tImp:
-		//mjAcquariumController.t.stop(timerPrintStandby);
-		switch (Menuprincipale) {
-		case 0:
-			Scorrimenu(Menuprincipale, 6, VociMenuPrincipale);
+		case tHome:
+			FunzionamentoNormale();
 			break;
-
-		case 1:
-			ImpostaData();
+		case tImp:
+			//mjAcquariumController.t.stop(timerPrintStandby);
+			switch (Menuprincipale) {
+			case 0: Scorrimenu(Menuprincipale, 6, VociMenuPrincipale); break;
+			case 1: ImpostaData(); break;
+			case 2:
+				//Impostazioni = false;
+				MenuLuci = 0;
+				stampato = false;
+				avvio = true;
+				//Luci = true;
+				menu = tLuci;
+				break;
+			case 3: Impostatempacqua(); break;
+			case 4: InfoLuci(); break;
+			case 5:
+				mjAcquariumController.saveSettings();
+				salva();
+				break;
+			case 6:
+				mjAcquariumController.loadSettings();
+				carica();
+				break;
+			}
 			break;
-
-		case 2:
-			//Impostazioni = false;
-			MenuLuci = 0;
-			stampato = false;
-			avvio = true;
-			//Luci = true;
-			menu = tLuci;
+		case tLuci:
+			switch (MenuLuci) {
+			case 0: Scorrimenu(MenuLuci, 4, VociMenuluci);break;
+			case 1: ImpDatiFotoperiodo(tLinea1);break;
+			case 2: ImpDatiFotoperiodo(tLinea2);break;
+			case 3: ImpDatiFotoperiodo(tLinea3);break;
+			case 4: ImpostaFunzLinee();break;
+			}
 			break;
-
-		case 3:
-			Impostatempacqua();
-			break;
-
-		case 4:
-			InfoLuci();
-			break;
-		case 5:
-			//salva();
-			mjAcquariumController.saveSettings();
-			salva();
-			break;
-		case 6:
-			mjAcquariumController.loadSettings();
-			carica();
-			break;
-		}
-
-		break;
-	case tLuci:
-		switch (MenuLuci) {
-		case 0:
-			Scorrimenu(MenuLuci, 4, VociMenuluci);
-			break;
-
-		case 1:
-			ImpDatiFotoperiodo(Linea1);
-			break;
-
-		case 2:
-			ImpDatiFotoperiodo(Linea2);
-			break;
-
-		case 3:
-			ImpDatiFotoperiodo(Linea3);
-			break;
-
-		case 4:
-			ImpostaFunzLinee();
-			break;
-		}
-		break;
 	}
 
 	tasto = tNull;
-
 	mjAcquariumController.t.update();
 	// reset il  watchdog
 	wdt_reset();
@@ -574,61 +521,34 @@ void loop() {
 // stampa0 ???
 String printDigit(int digits) {
 	String temp = "";
-	if (digits < 10)
-		temp += "0";
+	if (digits < 10) temp += "0";
 	temp += digits;
 	return temp;
 }
 
 void keypadEvent(KeypadEvent eKey) {
-	//Serial.println(eKey);
-
-#ifdef DEBUG
-#ifdef DEBUG_KEY
-	Serial.print(F("Tasto: "));
-	Serial.println(eKey);
-	lcd.setCursor(0, 2);
-	lcd.print(eKey);
-#endif
-#endif
-
 	switch (keypad.getState()) {
-	case PRESSED:
-		lcd.backlight();
-	 	mjAcquariumController.t.stop(timerLCDbacklight);
-		timerLCDbacklight = mjAcquariumController.t.every(settings.lcdBacklightTime,timerDoLCDbacklight);
+		case PRESSED:
+			lcd.backlight();
+			mjAcquariumController.t.stop(timerLCDbacklight);
+			timerLCDbacklight = mjAcquariumController.t.every(settings.lcdBacklightTime,timerDoLCDbacklight);
 
-		switch (eKey) {
-		case '#':
-			tasto = tok;
-			break;
-		case '*':                 //* is to reset password attempt
-			tasto = tesc;
-			menu=tHome;
-			initfunc = true;
-			break;
-		case 'A':
-			break;
-		case 'B':
-			//tasto = tok;
-			break;
-		case '6':
-			tasto = tdx;
-			break;
-		case '4':
-			tasto = tsx;
-			break;
-		case '2':
-			tasto = tdec;
-			break;
-		case '8':
-			tasto = tinc;
-			break;
-		case 'D':
-			lcd.noBacklight();
-			break;
-		default:
-			break;
-		}
+			switch (eKey) {
+				case '#': tasto = tok;break;
+				case '*':
+					tasto = tesc;
+					menu=tHome;
+					initfunc = true;
+					Serial.println(eKey);
+					break;
+				case 'A': break;
+				case 'B': break;
+				case '6': tasto = tdx; break;
+				case '4': tasto = tsx; break;
+				case '2': tasto = tdec; break;
+				case '8': tasto = tinc; break;
+				case 'D': lcd.noBacklight(); break;
+				default: break;
+			}
 	}
 }
