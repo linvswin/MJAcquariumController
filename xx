@@ -71,6 +71,12 @@ Program:   24974 bytes (76.2% Full)
 Data:       1475 bytes (72.0% Full)
 (.data + .bss + .noinit)
 
+Program:   25680 bytes (78.4% Full)
+(.text + .data + .bootloader)
+
+Data:       1522 bytes (74.3% Full)
+(.data + .bss + .noinit)
+
 La scheda ad ogni modo servirà per accendere o spengere:
 Rel 1  - Riscaldatori
 Rel 2  - Alimentatore linea luci 1 (alim. separate per non avere un black-out totale in caso di guasto)

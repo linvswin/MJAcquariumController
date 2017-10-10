@@ -91,46 +91,4 @@ void Impostatempacqua()
 }
 
 
-void MantenimentoTempAcqua ()
-{ 
-	/*Serial.print("temp read:");
-	Serial.print(mjAcquariumController.getTemp());
-	Serial.print(" - temp setting:");
-	Serial.println(settings.Tempacqua);*/
 
-	if (mjAcquariumController.getTemp() < settings.Tempacqua) mjAcquariumController.setRele(RELE1_PIN, HIGH);
-	else mjAcquariumController.setRele(RELE1_PIN, LOW);
-
-	//lcd.setCursor(3, 2);
-	if ((mjAcquariumController.getTemp() < settings.Tempacqua - settings.TempRange) || (mjAcquariumController.getTemp() > settings.Tempacqua + settings.TempRange))
-	{
-		statoalrm = 1;
-		if (tasto == tesc) alrmsonoro = false;
-
-		if (millis() - tmplampprec > 1000)
-		{
-			tmplampprec = millis();
-			statoalrm = 1 - statoalrm;
-		}
-		/*if (menu==tHome)
-		{
-			if (statoalrm == 1)
-			{
-				lcd.print(tmed);
-				lcd.write(0b011011111);
-			}
-
-			if (statoalrm == 0) lcd.print(F("       "));
-		}*/
-
-		if (alrmsonoro == true) beep = 1;
-	} else {
-		if (menu==tHome)
-		{
-			//lcd.print(tmed);
-			//lcd.write(0b011011111);
-			tmplampprec = millis();
-			alrmsonoro = true;
-		}
-	}
-}

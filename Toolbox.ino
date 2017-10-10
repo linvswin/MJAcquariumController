@@ -1,4 +1,4 @@
-void Cicalino()
+/*void Cicalino()
 {
 	if (beep > 0 && millis() - lastCicalino > 30) {
 		if (statoBeep == 0)
@@ -10,7 +10,7 @@ void Cicalino()
 		statoBeep = !statoBeep;
 		lastCicalino = millis();
 	}
-}
+}*/
 
 /*
  *  Controllo di tutte le variabili che devono ciclare in incremento o decremento
@@ -42,10 +42,10 @@ void stampafrecce(byte pos) // Creata per evidenziare i dati in aggiornamento se
 	}
 }
 
-void stampa0(int dato_tempo) {
+/*void stampa0(int dato_tempo) {
 	if (dato_tempo < 10) lcd.print(F("0"));
 	lcd.print(dato_tempo);
-}
+}*/
 
 void Scorrimenu(byte &Menu, byte NrVoci, char* arraymenu[]) {
 	if (avvio) {

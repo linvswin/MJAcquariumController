@@ -7,11 +7,10 @@
 
 #ifndef MJLUCI_H_
 #define MJLUCI_H_
-/*
+
 #include "Arduino.h"
 class MJLuci {
 public:
-
 	byte OraOn;					//Pos 1
 	byte MinOn;					//Pos 2
 	byte OraOff;				//Pos 3
@@ -24,6 +23,7 @@ public:
 	byte MinIT;					//Pos 10
 	byte Funzionamento;			//Pos 11 0 se la linea e Off in manuale, 1 se la linea ON in manuale, 2 se la linea è in AUT fuzionamento automatico
 	byte MaxFading;				//Pos 12 Contiene il valore di luminosità massima impostata
+
 	boolean Alba;				//stato alba
 	boolean Tramonto;			//stato tramonto
 	byte Fading;				//Valore di Fading
@@ -37,5 +37,5 @@ public:
 	virtual ~MJLuci();
 
 };
-*/
+
 #endif /* MJLUCI_H_ */

@@ -114,7 +114,7 @@ void ImpostaFunzLinee()
 					{
 						//EEPROM.write(IndBase + 1, Appoggio[i].MaxFading);
 						settings.Plafo[i].MaxFading = Appoggio[i].MaxFading;
-						settings.Plafo[linea].Tempoprec = millis();
+						Plafo2[linea].Tempoprec = millis();
 					}
 					if (Appoggio[i].Funzionamento != settings.Plafo[i].Funzionamento)
 					{
@@ -183,41 +183,41 @@ void Statoluci(	byte linea)
 		Iniziotramonto = Spegnimento - Finealba; // Finealba corrisponde alla durata del Fading
 
 		// Calcolo dell'intervallo temporale tra l'incremento/decremento delle rampe durante alba/tramonto, espresso in millesimi di secondo
-		settings.Plafo[linea].DeltaFading = (OrarioInSecondi(settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad) * 1000) / settings.Plafo[linea].MaxFading;
+		Plafo2[linea].DeltaFading = (OrarioInSecondi(settings.Plafo[linea].OreFad, settings.Plafo[linea].MinFad) * 1000) / settings.Plafo[linea].MaxFading;
 
 		// Inizio dei controlli per scoprire in base all'ora attuale in quale momento del fotoperiodo della linea in questione mi trovo...
 		if (Temporeale > Spegnimento) // Se le luci sono spente
 		{
-			settings.Plafo[linea].Alba = false;
-			settings.Plafo[linea].Tramonto = false;
-			settings.Plafo[linea].StatoPower = false;
-			analogWrite(settings.Plafo[linea].NrPin, 0);				// Azzero il fading
+			Plafo2[linea].Alba = false;
+			Plafo2[linea].Tramonto = false;
+			Plafo2[linea].StatoPower = false;
+			analogWrite(Plafo2[linea].NrPin, 0);				// Azzero il fading
 			//setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);	// Spengo l'alimentatore della linea
-			mjAcquariumController.setRele(settings.Plafo[linea].Powerline, LOW);
+			mjAcquariumController.setRele(Plafo2[linea].Powerline, LOW);
 		}else{ // Se l'ora attuale è all'interno del periodo di alba
 			if (Temporeale < Finealba)
 			{
-				settings.Plafo[linea].Alba = true;
-				settings.Plafo[linea].Tramonto = false;
-				settings.Plafo[linea].Fading = (Temporeale * 1000) / settings.Plafo[linea].DeltaFading; // Calcolo il valore di fading in base a Temporeale
+				Plafo2[linea].Alba = true;
+				Plafo2[linea].Tramonto = false;
+				Plafo2[linea].Fading = (Temporeale * 1000) / Plafo2[linea].DeltaFading; // Calcolo il valore di fading in base a Temporeale
 			} else {	// Se Temporeale è all'interno del periodo di luce piena
 				if (Temporeale < Iniziotramonto)
 				{
-					settings.Plafo[linea].Alba = false;
-					settings.Plafo[linea].Tramonto = false;
-					settings.Plafo[linea].Fading = settings.Plafo[linea].MaxFading;
+					Plafo2[linea].Alba = false;
+					Plafo2[linea].Tramonto = false;
+					Plafo2[linea].Fading = settings.Plafo[linea].MaxFading;
 				}else{ // Se temporeale è all'interno del periodo di tramonto
-					settings.Plafo[linea].Alba = false;
-					settings.Plafo[linea].Tramonto = true;
-					settings.Plafo[linea].Fading = settings.Plafo[linea].MaxFading - (((Temporeale - Iniziotramonto) * 1000) / settings.Plafo[linea].DeltaFading); // Calcolo il valore di fading in base a Temporeale
+					Plafo2[linea].Alba = false;
+					Plafo2[linea].Tramonto = true;
+					Plafo2[linea].Fading = settings.Plafo[linea].MaxFading - (((Temporeale - Iniziotramonto) * 1000) / Plafo2[linea].DeltaFading); // Calcolo il valore di fading in base a Temporeale
 				}
 			}
 			// Comandi fissi se le luci non sono spente
 			//setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);			//Alimento la linea led
-			mjAcquariumController.setRele(settings.Plafo[linea].Powerline, HIGH);
-			analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);	//Setto la luminosità della linea in base al fading calcolato
-			settings.Plafo[linea].Tempoprec = millis();						//Valore necessario in gestione luci per scandire il fading
-			settings.Plafo[linea].StatoPower = true;							//Flag per la verifica dello stato di alimentazione della linea
+			mjAcquariumController.setRele(Plafo2[linea].Powerline, HIGH);
+			analogWrite(Plafo2[linea].NrPin, Plafo2[linea].Fading);	//Setto la luminosità della linea in base al fading calcolato
+			Plafo2[linea].Tempoprec = millis();						//Valore necessario in gestione luci per scandire il fading
+			Plafo2[linea].StatoPower = true;							//Flag per la verifica dello stato di alimentazione della linea
 		}
 	}
 }
@@ -319,9 +319,9 @@ void InfoLuci()
 		lcd.print(F("L"));
 		lcd.print(linea + 1);
 		lcd.print(*TXT_DUEPUNTI);
-		lcd.print( ( settings.Plafo[linea].StatoPower == false)? TXT_OFF : TXT_ON );
+		lcd.print( ( Plafo2[linea].StatoPower == false)? TXT_OFF : TXT_ON );
 		lcd.print(F(" Fad:"));
-		lcd.print( (settings.Plafo[linea].Fading * 100) / settings.Plafo[linea].MaxFading );
+		lcd.print( (Plafo2[linea].Fading * 100) / settings.Plafo[linea].MaxFading );
 		lcd.print(TXT_PERCENTUALE);
 		lcd.setCursor(17, linea + 1);
 		lcd.print( (settings.Plafo[linea].Funzionamento == 2 ? F("A") : F("M")) );
@@ -333,7 +333,8 @@ void InfoLuci()
 	}
 }
 
-void TotaliFtp (byte OraOn, byte MinOn, byte OraOff, byte MinOff, byte OreFad, byte MinFad)  //Creata per controllare che tutti i dati del fotoperiodo siano congrui
+//Creata per controllare che tutti i dati del fotoperiodo siano congrui
+void TotaliFtp (byte OraOn, byte MinOn, byte OraOff, byte MinOff, byte OreFad, byte MinFad)
 { 
 	if (OraOff <= OraOn)
 	{
@@ -378,17 +379,23 @@ void ImpDatiFotoperiodo (byte linea)
 		lcd.setCursor(0, 1);
 		lcd.print(TXT_ACCLUNGSPG);
 		lcd.setCursor(0, 2);
-		stampa0(settings.Plafo[linea].OraOn);
+		//stampa0(settings.Plafo[linea].OraOn);
+		lcd.print(printDigit(settings.Plafo[linea].OraOn));
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(settings.Plafo[linea].MinOn);
+		//stampa0(settings.Plafo[linea].MinOn);
+		lcd.print(printDigit(settings.Plafo[linea].MinOn));
 		lcd.setCursor(7, 2);
-		stampa0(OreTot);
+		//stampa0(OreTot);
+		lcd.print(OreTot);
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(MinTot);
+		//stampa0(MinTot);
+		lcd.print(MinTot);
 		lcd.setCursor(14, 2);
-		stampa0(settings.Plafo[linea].OraOff);
+		//stampa0(settings.Plafo[linea].OraOff);
+		lcd.print(settings.Plafo[linea].OraOff);
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(settings.Plafo[linea].MinOff);
+		//stampa0(settings.Plafo[linea].MinOff);
+		lcd.print(settings.Plafo[linea].MinOff);
 	}
 
 	if (Titoloimpostazionefotoperiodo == 2)
@@ -398,14 +405,18 @@ void ImpDatiFotoperiodo (byte linea)
 		lcd.setCursor(0, 1);
 		lcd.print(TXT_DURFADLUCEMAX);
 		lcd.setCursor(0, 2);
-		stampa0(settings.Plafo[linea].OreFad);
+		//stampa0(settings.Plafo[linea].OreFad);
+		lcd.print(settings.Plafo[linea].OreFad);
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(settings.Plafo[linea].MinFad);
+		//stampa0(settings.Plafo[linea].MinFad);
+		lcd.print(settings.Plafo[linea].MinFad);
 		//lcd.setCursor(14, 2);
 		lcd.print(F("        "));
-		stampa0(OreLuceMax);
+		//stampa0(OreLuceMax);
+		lcd.print(OreLuceMax);
 		lcd.print(*TXT_DUEPUNTI);
-		stampa0(MinLuceMax);
+		//stampa0(MinLuceMax);
+		lcd.print(MinLuceMax);
 		lcd.print(F("  "));
 	}
 
