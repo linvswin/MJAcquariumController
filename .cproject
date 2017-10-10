@@ -30,12 +30,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Keypad}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Keypad/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/MandJTimer}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/NewliquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/NewliquidCrystal/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Rtc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Rtc/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/PCF8574}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/MandJTimer}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.2003420263" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -52,12 +51,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Keypad}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Keypad/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/MandJTimer}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/NewliquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/NewliquidCrystal/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Rtc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Rtc/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/PCF8574}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/MandJTimer}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1299455054" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -74,12 +72,11 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Keypad}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Keypad/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/MandJTimer}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/NewliquidCrystal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/NewliquidCrystal/utility}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Rtc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/Rtc/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/PCF8574}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MJAcquariumController/libraries/MandJTimer}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.249651328" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

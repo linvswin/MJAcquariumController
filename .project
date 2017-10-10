@@ -77,11 +77,6 @@
 			<location>/home/peppe/Arduino/libraries/OneWire</location>
 		</link>
 		<link>
-			<name>libraries/PCF8574</name>
-			<type>2</type>
-			<location>/home/peppe/Arduino/libraries/PCF8574</location>
-		</link>
-		<link>
 			<name>libraries/Rtc</name>
 			<type>2</type>
 			<location>/home/peppe/Arduino/libraries/Rtc</location>

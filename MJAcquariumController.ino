@@ -498,8 +498,11 @@ void keypadEvent(KeypadEvent eKey) {
 				case '#': tasto = tok;break;
 				case '*':
 					tasto = tesc;
-					menu=tHome;
-					initfunc = true;
+					/*if (menu==tLuci){
+						menu=tImp;
+						Menuprincipale = 0;
+					}else menu=tHome;
+					initfunc = true;*/
 					Serial.println(eKey);
 					break;
 				case 'A':

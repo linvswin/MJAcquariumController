@@ -72,16 +72,17 @@ void ImpostaFunzLinee()
 
 	if (tasto == tesc)
 	{
-		menu=tHome;
+		menu=tImp;
+		Menuprincipale=0;
 		initfunc = true;
 	}
 
-	lcd.setCursor(0, 3);
+	lcd.setCursor(6, 3);
 	switch (Parteimpostazione)
 	{
 		case 0:		// Scelta della linea da impostare
-			stampafrecce(6);
-			//lcd.print(F("^             "));
+			//stampafrecce(6);
+			lcd.print(F("^             "));
 			if (tasto == tinc) SoglieCiclo(linea, 0, 2, 0);
 			if (tasto == tdec) SoglieCiclo(linea, 0, 2, 1);
 
@@ -222,92 +223,6 @@ void Statoluci(	byte linea)
 	}
 }
 
-/*void GestioneLuci (byte linea)
-{ 
-	switch (settings.Plafo[linea].Funzionamento)
-	{
-		case tOff:								// Se è stato impostato OFF manuale
-			if (settings.Plafo[linea].Fading == 0)	// Se sono arrivato al fading minimo e sono in OFF manuale disattivo lo switch
-			{
-				settings.Plafo[linea].Funzionamento = 3;
-				//setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);
-				mjAcquariumController.setRele(settings.Plafo[linea].Powerline, LOW);
-				settings.Plafo[linea].StatoPower = false;
-			}else{
-				if (((millis() - settings.Plafo[linea].Tempoprec) >= 110) && (settings.Plafo[linea].Fading > 0))
-				{
-					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + 110;
-					settings.Plafo[linea].Fading --;
-					analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
-				}
-			}
-			break;
-		case tOn:		// Se è stato impostato ON manuale
-			// Se sono arrivato al fading massimo e sono in ON manuale disattivo lo switch
-			if (settings.Plafo[linea].Fading == settings.Plafo[linea].MaxFading) settings.Plafo[linea].Funzionamento = 3;
-			else{
-				//setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);		// come sopra, ma accendo.
-				mjAcquariumController.setRele(settings.Plafo[linea].Powerline, HIGH);
-				settings.Plafo[linea].StatoPower = true;
-				if (((millis() - settings.Plafo[linea].Tempoprec) >= 110) && (settings.Plafo[linea].Fading < settings.Plafo[linea].MaxFading))
-				{
-					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + 110;
-					settings.Plafo[linea].Fading ++;
-					analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
-				}
-			}
-			break;
-		case tAuto:
-			if (settings.Plafo[linea].Alba == true)
-			{
-				if ((millis() - settings.Plafo[linea].Tempoprec) >= settings.Plafo[linea].DeltaFading)
-				{
-					settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + settings.Plafo[linea].DeltaFading;
-					if (settings.Plafo[linea].Fading < settings.Plafo[linea].MaxFading)
-					{
-						settings.Plafo[linea].Fading += 1;
-						analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
-					}else settings.Plafo[linea].Alba = false;
-				}
-			}else{
-				if (settings.Plafo[linea].Tramonto == true)
-				{
-					if ((millis() - settings.Plafo[linea].Tempoprec) >= settings.Plafo[linea].DeltaFading)
-					{
-						settings.Plafo[linea].Tempoprec = settings.Plafo[linea].Tempoprec + settings.Plafo[linea].DeltaFading;
-						if (settings.Plafo[linea].Fading > 0)
-						{
-							settings.Plafo[linea].Fading -= 1;
-							analogWrite(settings.Plafo[linea].NrPin, settings.Plafo[linea].Fading);
-						}else{
-							settings.Plafo[linea].Tramonto = false;
-							//setpinpcf(schrele, settings.Plafo[linea].Powerline, 1);
-							mjAcquariumController.setRele(settings.Plafo[linea].Powerline, LOW);
-							settings.Plafo[linea].StatoPower = false;
-						}
-					}
-				}else{
-					if ((settings.Plafo[linea].OraOn == mjAcquariumController.now.Hour()) && (settings.Plafo[linea].MinOn == mjAcquariumController.now.Minute()) && (settings.Plafo[linea].Alba == false))
-					{
-						settings.Plafo[linea].Alba = true;
-						settings.Plafo[linea].Tempoprec = millis();
-						settings.Plafo[linea].Fading = 0;
-						//setpinpcf(schrele, settings.Plafo[linea].Powerline, 0);
-						mjAcquariumController.setRele(settings.Plafo[linea].Powerline, HIGH);
-						settings.Plafo[linea].StatoPower = true;
-					}else{
-						if ((settings.Plafo[linea].OraIT == mjAcquariumController.now.Hour()) && (settings.Plafo[linea].MinIT == mjAcquariumController.now.Minute()) && (settings.Plafo[linea].Tramonto == false))
-						{
-							settings.Plafo[linea].Tramonto = true;
-							settings.Plafo[linea].Tempoprec = millis();
-							settings.Plafo[linea].Fading = settings.Plafo[linea].MaxFading;
-						}
-					}
-				}
-			}
-			break;
-	}
-}*/
 
 void InfoLuci()
 { 

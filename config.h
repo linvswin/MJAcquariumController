@@ -178,9 +178,10 @@ struct AcquariumSettings{
 	60,							// durata retroilluminazione
 };
 
-byte OraOnPrec, OreTotPrec, MinOnPrec, MinTotPrec, OraOffPrec, MinOffPrec,
-		OreFadPrec, MinFadPrec, OreLuceMax, MinLuceMax; // Variabili per controlli variazione
-byte OreTot, MinTot, nrlinea;
+
+byte OraOnPrec,OreTotPrec,MinOnPrec,OraOffPrec,MinOffPrec,MinTotPrec,OreLuceMax,MinLuceMax,OreFadPrec, MinFadPrec; // Variabili per controlli variazione
+byte OreTot,MinTot;
+//, nrlinea;
 int Fadeinmin, ITinmin, Offinmin, Oninmin, FAinmin; // Variabili per calcolo inizio alba e tramonto
 byte DatoFotoperiodo, TipoFotoperiodo, acquisizionedatifotoperiodo,
 		Titoloimpostazionefotoperiodo, Parteimpostazione, LimitecaseInf,
