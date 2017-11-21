@@ -202,7 +202,7 @@ struct Dati Appoggio[3];// Serve come appoggio dei dati durante la loro impostaz
 // ed impazzirebbe
 
 /************ Sensori ************/
-#define I2C_RELE_ADDR 0x22
+//#define I2C_RELE_ADDR 0x22
 // pin del PCF8574 connessi ai rele
 /*#define I2C_RELE1_PIN 0		//Termostato
 #define I2C_RELE2_PIN 1		//Alimentazione linea 1 Luci
